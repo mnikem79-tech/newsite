@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { L } from '@/components/L';
 
 export interface ProductInitial {
   id?: number;
@@ -9,9 +8,7 @@ export interface ProductInitial {
   code: string;
   category_id: number;
   name_ru: string;
-  name_en: string;
   description_ru: string;
-  description_en: string;
   price: number | string | null;
   price_note: string | null;
   is_active: boolean;
@@ -22,7 +19,7 @@ export default function ProductForm({
   categories,
   initial,
 }: {
-  categories: { id: number; code: string; name_ru: string; name_en: string }[];
+  categories: { id: number; code: string; name_ru: string }[];
   initial: ProductInitial | null;
 }) {
   const router = useRouter();
@@ -30,9 +27,7 @@ export default function ProductForm({
     code: initial?.code ?? '',
     category_id: initial?.category_id ?? categories[0]?.id ?? 0,
     name_ru: initial?.name_ru ?? '',
-    name_en: initial?.name_en ?? '',
     description_ru: initial?.description_ru ?? '',
-    description_en: initial?.description_en ?? '',
     price: initial?.price != null ? String(initial.price) : '',
     price_note: initial?.price_note ?? '',
     is_active: initial?.is_active ?? true,
@@ -91,25 +86,13 @@ export default function ProductForm({
           <input value={f.icon} onChange={set('icon')} maxLength={8} />
         </div>
       </div>
-      <div className="frow">
-        <div className="field">
-          <label>Наименование (RU) *</label>
-          <input value={f.name_ru} onChange={set('name_ru')} />
-        </div>
-        <div className="field">
-          <label>Наименование (EN)</label>
-          <input value={f.name_en} onChange={set('name_en')} />
-        </div>
+      <div className="field">
+        <label>Наименование *</label>
+        <input value={f.name_ru} onChange={set('name_ru')} />
       </div>
-      <div className="frow">
-        <div className="field">
-          <label>Описание (RU)</label>
-          <textarea rows={4} value={f.description_ru} onChange={set('description_ru')} />
-        </div>
-        <div className="field">
-          <label>Описание (EN)</label>
-          <textarea rows={4} value={f.description_en} onChange={set('description_en')} />
-        </div>
+      <div className="field">
+        <label>Описание</label>
+        <textarea rows={4} value={f.description_ru} onChange={set('description_ru')} />
       </div>
       <div className="frow">
         <div className="field">
@@ -123,12 +106,12 @@ export default function ProductForm({
       </div>
       <label className="check">
         <input type="checkbox" checked={f.is_active} onChange={(e) => setF((p) => ({ ...p, is_active: e.target.checked }))} />
-        <L ru="Показывать в каталоге" en="Show in catalog" />
+        Показывать в каталоге
       </label>
       {err && <div className="alert err" style={{ marginTop: 16 }}>{err}</div>}
       {ok && <div className="alert ok" style={{ marginTop: 16 }}>Сохранено</div>}
       <div className="form-actions">
-        <button className="btn primary" disabled={busy}>{busy ? '…' : <L ru="Сохранить" en="Save" />}</button>
+        <button className="btn primary" disabled={busy}>{busy ? '…' : 'Сохранить'}</button>
       </div>
     </form>
   );

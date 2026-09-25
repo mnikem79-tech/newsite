@@ -13,7 +13,7 @@ async function adminId(): Promise<number | null> {
 // GET /api/products — public list
 export async function GET() {
   const r = await q(
-    `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru, c.name_en AS cat_en
+    `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru
      FROM products p JOIN categories c ON c.id = p.category_id
      WHERE p.is_active = TRUE ORDER BY c.position, p.position`
   );
@@ -31,23 +31,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }
   const name_ru = String(b?.name_ru ?? '').trim();
-  const name_en = String(b?.name_en ?? '').trim();
   const category_id = Number(b?.category_id);
-  if (!name_ru && !name_en) return NextResponse.json({ error: 'name required' }, { status: 400 });
+  if (!name_ru) return NextResponse.json({ error: 'name required' }, { status: 400 });
   if (!Number.isInteger(category_id)) return NextResponse.json({ error: 'category required' }, { status: 400 });
 
   const code = String(b?.code ?? '').trim() || '—';
-  const slugBase = (name_ru || name_en).toLowerCase().replace(/[^a-zа-яё0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'product';
+  const slugBase = name_ru.toLowerCase().replace(/[^a-zа-яё0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'product';
   let slug = `${slugBase}-${code.replace(/[./\s]+/g, '-')}`.replace(/^-+|-+$/g, '').slice(0, 70);
 
   const res = await q(
-    `INSERT INTO products (slug, category_id, code, name_ru, name_en, description_ru, description_en, price, price_note, is_active, icon, position)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, (SELECT COALESCE(MAX(position),0)+1 FROM products))
+    `INSERT INTO products (slug, category_id, code, name_ru, description_ru, price, price_note, is_active, icon, position)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, (SELECT COALESCE(MAX(position),0)+1 FROM products))
      RETURNING id, slug`,
     [
       slug, category_id, code,
-      name_ru, name_en || name_ru,
-      String(b?.description_ru ?? ''), String(b?.description_en ?? ''),
+      name_ru,
+      String(b?.description_ru ?? ''),
       b?.price != null && b?.price !== '' ? Number(b.price) : null,
       b?.price_note ? String(b.price_note).slice(0, 200) : null,
       b?.is_active !== false,

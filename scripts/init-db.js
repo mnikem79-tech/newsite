@@ -40,9 +40,9 @@ function hashPassword(pw) {
     for (let i = 0; i < seed.categories.length; i++) {
       const c = seed.categories[i];
       const r = await pool.query(
-        `INSERT INTO categories (slug, code, name_ru, name_en, note_ru, note_en, icon, position)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
-        [c.slug, c.code, c.name_ru, c.name_en, c.note_ru, c.note_en, c.icon, i + 1]
+        `INSERT INTO categories (slug, code, name_ru, note_ru, icon, position)
+         VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+        [c.slug, c.code, c.name_ru, c.note_ru, c.icon, i + 1]
       );
       ids[c.slug] = r.rows[0].id;
     }
@@ -51,9 +51,9 @@ function hashPassword(pw) {
       p += 1;
       const slug = pr.code.replace(/[./]/g, '-');
       await pool.query(
-        `INSERT INTO products (slug, category_id, code, name_ru, name_en, description_ru, description_en, icon, position)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-        [slug, ids[pr.category_slug], pr.code, pr.name_ru, pr.name_en, pr.description_ru, pr.description_en, '⚡', p]
+        `INSERT INTO products (slug, category_id, code, name_ru, description_ru, icon, position)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        [slug, ids[pr.category_slug], pr.code, pr.name_ru, pr.description_ru, '⚡', p]
       );
     }
     console.log(`✓ seeded ${seed.categories.length} categories, ${seed.products.length} products`);

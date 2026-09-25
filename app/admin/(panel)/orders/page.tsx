@@ -1,5 +1,4 @@
 import { q } from '@/lib/db';
-import { L } from '@/components/L';
 import OrdersFilter from './orders-filter';
 
 export const dynamic = 'force-dynamic';
@@ -13,8 +12,8 @@ export default async function AdminOrders() {
     <>
       <div className="a-head">
         <div>
-          <h1><L ru="Заказы и заявки" en="Orders & requests" /></h1>
-          <div className="sub">{r.rows.length} <L ru="записей" en="records" /></div>
+          <h1>Заказы и заявки</h1>
+          <div className="sub">{r.rows.length} записей</div>
         </div>
       </div>
       <OrdersFilter

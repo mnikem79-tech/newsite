@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { L } from '@/components/L';
 import { HtmlBlock } from '@/components/HtmlBlock';
 import ServicesList from '@/components/ServicesList';
 import ContactForm from '@/components/ContactForm';
@@ -86,7 +85,7 @@ export function SectionRenderer({
               style={sectionStyle}
             >
               <div className={containerClass}>
-                <HtmlBlock htmlRu={sec.html_ru} htmlEn={sec.html_en} />
+                <HtmlBlock html={sec.html_ru} />
               </div>
             </section>
           );
@@ -100,10 +99,7 @@ export function SectionRenderer({
 
             return (
               <section key={sec.id} className="site-section" style={{ padding: 0 }}>
-                <HtmlBlock
-                  htmlRu={sanitizeHero(sec.html_ru)}
-                  htmlEn={sec.html_en ? sanitizeHero(sec.html_en) : undefined}
-                />
+                <HtmlBlock html={sanitizeHero(sec.html_ru)} />
               </section>
             );
           }
@@ -111,9 +107,6 @@ export function SectionRenderer({
             const [before, after] = hero.title_ru.includes('|')
               ? hero.title_ru.split('|')
               : [hero.title_ru, ''];
-            const [beforeEn, afterEn] = hero.title_en.includes('|')
-              ? hero.title_en.split('|')
-              : [hero.title_en, ''];
 
             return (
               <div className="hero align-top" key={sec.id}>
@@ -121,38 +114,38 @@ export function SectionRenderer({
                 <div className="bgimg" style={{ backgroundImage: "url('/img-2.jpg')" }} />
                 <div className="wrap" style={{ paddingTop: 36, paddingBottom: 50 }}>
                   <div className="kicker">
-                    ⚡ <L ru={hero.kicker_ru} en={hero.kicker_en} />
+                    ⚡ {hero.kicker_ru}
                   </div>
                   <h1>
-                    <L ru={before} en={beforeEn} />
+                    {before}
                     {after && (
                       <>
                         {' '}
-                        <span><L ru={after} en={afterEn} /></span>
+                        <span>{after}</span>
                       </>
                     )}
                   </h1>
-                  <p><L ru={hero.subtitle_ru} en={hero.subtitle_en} /></p>
+                  <p>{hero.subtitle_ru}</p>
                   <div className="cta">
                     <Link href="/catalog" className="btn primary">
-                      <span><L ru="Смотреть каталог" en="View catalog" /></span> →
+                      <span>Смотреть каталог</span> →
                     </Link>
                     <Link href="/contacts" className="btn ghost">
-                      <L ru="Оставить заявку" en="Send a request" />
+                      Оставить заявку
                     </Link>
                   </div>
                   <div className="stats">
                     <div className="stat">
                       <div className="n">230 <b>В</b> – <b>220</b> <b>кВ</b></div>
-                      <div className="l"><L ru="Диапазон напряжений конденсаторных установок" en="Capacitor unit voltage range" /></div>
+                      <div className="l">Диапазон напряжений конденсаторных установок</div>
                     </div>
                     <div className="stat">
                       <div className="n">9</div>
-                      <div className="l"><L ru="Разделов каталога продукции" en="Product catalog sections" /></div>
+                      <div className="l">Разделов каталога продукции</div>
                     </div>
                     <div className="stat">
                       <div className="n">5+</div>
-                      <div className="l"><L ru="Видов инженерных услуг" en="Engineering service types" /></div>
+                      <div className="l">Видов инженерных услуг</div>
                     </div>
                   </div>
                 </div>
@@ -164,21 +157,19 @@ export function SectionRenderer({
         // Catalog Categories Grid
         if (sec.type === 'catalog_grid') {
           const titleRu = sec.title_ru?.trim() || 'Каталог оборудования';
-          const titleEn = sec.title_en?.trim() || 'Equipment catalog';
           const subRu = sec.subtitle_ru?.trim() || 'Разделы каталога и типовые серии';
-          const subEn = sec.subtitle_en?.trim() || 'Catalog categories & series';
 
           return (
             <section key={sec.id} className="site-section" style={sectionStyle}>
               <div className="wrap">
                 <div className="shead rv">
                   <div>
-                    <div className="kick"><L ru="Продукция" en="Products" /></div>
-                    <h2 className="sec"><L ru={titleRu} en={titleEn} /></h2>
-                    <p className="lead"><L ru={subRu} en={subEn} /></p>
+                    <div className="kick">Продукция</div>
+                    <h2 className="sec">{titleRu}</h2>
+                    <p className="lead">{subRu}</p>
                   </div>
                   <Link href="/catalog" className="btn ghost">
-                    <span><L ru="Весь каталог" en="Full catalog" /></span> →
+                    <span>Весь каталог</span> →
                   </Link>
                 </div>
                 <div className="grid g3">
@@ -186,9 +177,9 @@ export function SectionRenderer({
                     <Link key={c.id} href={`/catalog?cat=${c.slug}`} className="card linkcard rv">
                       <div className="chd">
                         <div className="ic">{c.icon}</div>
-                        <h3><L ru={c.name_ru} en={c.name_en} /></h3>
+                        <h3>{c.name_ru}</h3>
                       </div>
-                      <p><L ru={c.note_ru ?? ''} en={c.note_en ?? ''} /></p>
+                      <p>{c.note_ru ?? ''}</p>
                     </Link>
                   ))}
                 </div>
@@ -218,7 +209,7 @@ export function SectionRenderer({
                     <div className="mat rv" key={i}>
                       <div className="code">{m.code}</div>
                       <div>
-                        <div className="t"><L ru={m.title_ru} en={m.title_en} /></div>
+                        <div className="t">{m.title_ru}</div>
                         <div className="m">{m.std}</div>
                       </div>
                     </div>
@@ -232,18 +223,17 @@ export function SectionRenderer({
         // Publications List
         if (sec.type === 'publications') {
           const titleRu = sec.title_ru?.trim() || 'Публикации';
-          const titleEn = sec.title_en?.trim() || 'Publications';
 
           return (
             <section key={sec.id} className="site-section" style={sectionStyle}>
               <div className="wrap">
-                <div className="shead"><div><h2 className="sec"><L ru={titleRu} en={titleEn} /></h2></div></div>
+                <div className="shead"><div><h2 className="sec">{titleRu}</h2></div></div>
                 {PUBS.map((p, i) => (
                   <div className="pub" key={i}>
                     <div className="n">{i + 1}</div>
                     <div>
-                      <div className="t"><L ru={p.t[0]} en={p.t[1]} /></div>
-                      <div className="m"><L ru={p.m[0]} en={p.m[1]} /></div>
+                      <div className="t">{p.t}</div>
+                      <div className="m">{p.m}</div>
                     </div>
                   </div>
                 ))}
@@ -255,17 +245,16 @@ export function SectionRenderer({
         // Patents List
         if (sec.type === 'patents') {
           const titleRu = sec.title_ru?.trim() || 'Патенты и программы для ЭВМ';
-          const titleEn = sec.title_en?.trim() || 'Patents & software';
 
           return (
             <section key={sec.id} className="site-section" style={sectionStyle}>
               <div className="wrap">
-                <div className="shead"><div><h2 className="sec"><L ru={titleRu} en={titleEn} /></h2></div></div>
+                <div className="shead"><div><h2 className="sec">{titleRu}</h2></div></div>
                 <div className="pat-list">
                   {PATS.map((p, i) => (
                     <div className="pat rv" key={i}>
                       <div className="code">{p.code}</div>
-                      <div className="desc"><L ru={p.d[0]} en={p.d[1]} /></div>
+                      <div className="desc">{p.d}</div>
                     </div>
                   ))}
                 </div>
@@ -281,11 +270,11 @@ export function SectionRenderer({
               <div className="wrap">
                 <div className="contact-grid">
                   <div className="cbox rv">
-                    <h3><L ru="Контактная информация" en="Contact information" /></h3>
+                    <h3>Контактная информация</h3>
                     <div className="crow">
                       <div className="ic">📞</div>
                       <div>
-                        <div className="k"><L ru="Телефон" en="Phone" /></div>
+                        <div className="k">Телефон</div>
                         <div className="v"><a href={contacts.phone_href}>{contacts.phone}</a></div>
                       </div>
                     </div>
@@ -299,15 +288,15 @@ export function SectionRenderer({
                     <div className="crow">
                       <div className="ic">📍</div>
                       <div>
-                        <div className="k"><L ru="Адрес" en="Address" /></div>
-                        <div className="v"><L ru={contacts.address_ru} en={contacts.address_en} /></div>
+                        <div className="k">Адрес</div>
+                        <div className="v">{contacts.address_ru}</div>
                       </div>
                     </div>
                     <div className="crow">
                       <div className="ic">🕐</div>
                       <div>
-                        <div className="k"><L ru="Режим работы" en="Working hours" /></div>
-                        <div className="v"><L ru={contacts.hours_ru} en={contacts.hours_en} /></div>
+                        <div className="k">Режим работы</div>
+                        <div className="v">{contacts.hours_ru}</div>
                       </div>
                     </div>
                     <div className="crow">
@@ -322,14 +311,12 @@ export function SectionRenderer({
                     <YandexMap
                       center={[53.5372, 49.4086]}
                       zoom={12}
-                      titleRu="Новый сайт"
-                      titleEn="New Site"
-                      addressRu={contacts.address_ru}
-                      addressEn={contacts.address_en}
+                      title="Новый сайт"
+                      address={contacts.address_ru}
                     />
                     <div className="mlabel">
                       <span style={{ fontSize: 18 }}>📍</span>
-                      <span><b>Новый сайт</b><br /><L ru={contacts.address_ru} en={contacts.address_en} /></span>
+                      <span><b>Новый сайт</b><br />{contacts.address_ru}</span>
                     </div>
                   </div>
                 </div>

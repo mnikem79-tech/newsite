@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { q } from '@/lib/db';
-import { L } from '@/components/L';
 import BuyBox from '@/components/BuyBox';
 import type { Product } from '@/lib/types';
 
@@ -12,7 +11,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   let product: Product | null = null;
   try {
     const r = await q(
-      `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru, c.name_en AS cat_en, c.icon AS cat_icon
+      `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru, c.icon AS cat_icon
        FROM products p JOIN categories c ON c.id = p.category_id
        WHERE p.slug = $1 AND p.is_active = TRUE`,
       [slug]
@@ -29,7 +28,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <div className="pagehead" style={{ paddingBottom: 20 }}>
         <div className="wrap">
           <div className="crumb">
-            <Link href="/">Главная</Link> / <Link href="/catalog">Каталог</Link> / <span><L ru={(p as any).cat_ru as string} en={(p as any).cat_en as string} /></span>
+            <Link href="/">Главная</Link> / <Link href="/catalog">Каталог</Link> / <span>{(p as any).cat_ru as string}</span>
           </div>
         </div>
       </div>
@@ -41,25 +40,22 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <div className="pic">{p.icon}</div>
                 <div>
                   <div className="code2">
-                    <Link href="/catalog" style={{ color: 'var(--muted2)' }}><L ru={(p as any).cat_ru as string} en={(p as any).cat_en as string} /></Link>
+                    <Link href="/catalog" style={{ color: 'var(--muted2)' }}>{(p as any).cat_ru as string}</Link>
                   </div>
                   <h1>
-                    <L ru={p.name_ru} en={p.name_en} />
+                    {p.name_ru}
                   </h1>
                 </div>
               </div>
-              <div className="desc"><L ru={p.description_ru} en={p.description_en} /></div>
+              <div className="desc">{p.description_ru}</div>
               <div className="notes" style={{ marginTop: 22 }}>
-                <b><L ru="Поставка" en="Supply" /></b>{' '}
-                <L
-                  ru="Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии."
-                  en="Delivery across Russia and CIS. Equipment is supplied with a complete package of permits, certificates and declarations of conformity."
-                />
+                <b>Поставка</b>{' '}
+                Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии.
               </div>
               <div className="feat-list" style={{ marginTop: 22 }}>
-                <div className="feat"><div className="chk">✓</div><p><L ru="Работа по ГОСТ и ТР, полная документация" en="Compliance with GOST and TR, full documentation" /></p></div>
-                <div className="feat"><div className="chk">✓</div><p><L ru="Возможна разработка по требованиям заказчика" en="Custom development to customer specifications" /></p></div>
-                <div className="feat"><div className="chk">✓</div><p><L ru="Инженерное сопровождение: расчёты, пусконаладка" en="Engineering support: calculations, commissioning" /></p></div>
+                <div className="feat"><div className="chk">✓</div><p>Работа по ГОСТ и ТР, полная документация</p></div>
+                <div className="feat"><div className="chk">✓</div><p>Возможна разработка по требованиям заказчика</p></div>
+                <div className="feat"><div className="chk">✓</div><p>Инженерное сопровождение: расчёты, пусконаладка</p></div>
               </div>
             </div>
             <BuyBox
@@ -68,7 +64,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 slug: p.slug,
                 code: p.code,
                 name_ru: p.name_ru,
-                name_en: p.name_en,
                 price: p.price == null ? null : Number(p.price),
                 price_note: p.price_note,
               }}

@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { L } from '@/components/L';
 
 export default function ProductActions({ id, name }: { id: number; name: string }) {
   const router = useRouter();
@@ -15,7 +14,7 @@ export default function ProductActions({ id, name }: { id: number; name: string 
   };
   return (
     <button className="mini-btn red" onClick={del} disabled={busy}>
-      {busy ? '…' : <L ru="Удалить" en="Delete" />}
+      {busy ? '…' : 'Удалить'}
     </button>
   );
 }

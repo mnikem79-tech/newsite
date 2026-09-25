@@ -57,7 +57,6 @@ export default async function AdminContent() {
           const def = getDefaultSections('home').find((d) => d.id === 'home-hero');
           if (def) {
             s.html_ru = def.html_ru;
-            s.html_en = def.html_en;
           }
         }
       });

@@ -24,11 +24,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 
   const name_ru = String(b?.name_ru ?? '').trim();
-  const name_en = String(b?.name_en ?? '').trim() || name_ru;
   const code = String(b?.code ?? '').trim() || '—';
   const icon = String(b?.icon ?? '⚡').trim().slice(0, 8) || '⚡';
   const note_ru = String(b?.note_ru ?? '').trim();
-  const note_en = String(b?.note_en ?? '').trim() || note_ru;
   const position = Number.isFinite(Number(b?.position)) ? Number(b.position) : 0;
 
   if (!name_ru) {
@@ -38,10 +36,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const res = await q(
       `UPDATE categories
-       SET code = $2, name_ru = $3, name_en = $4, note_ru = $5, note_en = $6, icon = $7, position = $8
+       SET code = $2, name_ru = $3, note_ru = $4, icon = $5, position = $6
        WHERE id = $1
        RETURNING *`,
-      [id, code, name_ru, name_en, note_ru, note_en, icon, position]
+      [id, code, name_ru, note_ru, icon, position]
     );
 
     if (!res.rows.length) {

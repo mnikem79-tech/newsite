@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useLang } from './L';
 
 declare global {
   interface Window {
@@ -12,14 +11,11 @@ declare global {
 type Props = {
   center: [number, number];
   zoom?: number;
-  titleRu: string;
-  titleEn: string;
-  addressRu: string;
-  addressEn: string;
+  title: string;
+  address: string;
 };
 
-export default function YandexMap({ center, zoom = 12, titleRu, titleEn, addressRu, addressEn }: Props) {
-  const { lang } = useLang();
+export default function YandexMap({ center, zoom = 12, title, address }: Props) {
   const divRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null);
@@ -58,8 +54,8 @@ export default function YandexMap({ center, zoom = 12, titleRu, titleEn, address
             new window.ymaps.Placemark(
               center,
               {
-                balloonContent: `<b>${titleRu}</b><br>${addressRu}`,
-                hintContent: titleRu,
+                balloonContent: `<b>${title}</b><br>${address}`,
+                hintContent: title,
               },
               { iconColor: '#25c3d6' },
             ),
@@ -88,16 +84,16 @@ export default function YandexMap({ center, zoom = 12, titleRu, titleEn, address
       <div className="map-fallback">
         <span style={{ fontSize: 30 }}>📍</span>
         <div>
-          <b>{lang === 'ru' ? titleRu : titleEn}</b>
+          <b>{title}</b>
           <br />
-          {lang === 'ru' ? addressRu : addressEn}
+          {address}
         </div>
         <a
-          href={`https://yandex.ru/maps/?text=${encodeURIComponent((lang === 'ru' ? addressRu : addressEn) + ' ' + titleRu)}`}
+          href={`https://yandex.ru/maps/?text=${encodeURIComponent(address + ' ' + title)}`}
           target="_blank"
           rel="noreferrer"
         >
-          {lang === 'ru' ? 'Открыть в Яндекс Картах' : 'Open in Yandex Maps'} ↗
+          Открыть в Яндекс Картах ↗
         </a>
       </div>
     );
@@ -106,7 +102,7 @@ export default function YandexMap({ center, zoom = 12, titleRu, titleEn, address
   return (
     <>
       <div ref={divRef} className="ymap" />
-      {!ready && <div className="ymap-load">{lang === 'ru' ? 'Загрузка карты…' : 'Loading map…'}</div>}
+      {!ready && <div className="ymap-load">Загрузка карты…</div>}
     </>
   );
 }

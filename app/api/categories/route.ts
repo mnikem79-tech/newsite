@@ -40,11 +40,9 @@ export async function POST(req: Request) {
   }
 
   const name_ru = String(b?.name_ru ?? '').trim();
-  const name_en = String(b?.name_en ?? '').trim() || name_ru;
   const code = String(b?.code ?? '').trim() || '—';
   const icon = String(b?.icon ?? '⚡').trim().slice(0, 8) || '⚡';
   const note_ru = String(b?.note_ru ?? '').trim();
-  const note_en = String(b?.note_en ?? '').trim() || note_ru;
 
   if (!name_ru) {
     return NextResponse.json({ error: 'Название раздела обязательно' }, { status: 400 });
@@ -76,10 +74,10 @@ export async function POST(req: Request) {
     const position = Number(b?.position) || maxPosRes.rows[0]?.next_pos || 1;
 
     const res = await q(
-      `INSERT INTO categories (slug, code, name_ru, name_en, note_ru, note_en, icon, position)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO categories (slug, code, name_ru, note_ru, icon, position)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [customSlug, code, name_ru, name_en, note_ru, note_en, icon, position]
+      [customSlug, code, name_ru, note_ru, icon, position]
     );
 
     return NextResponse.json(res.rows[0], { status: 201 });

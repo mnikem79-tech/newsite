@@ -3,9 +3,7 @@ export interface Category {
   slug: string;
   code: string;
   name_ru: string;
-  name_en: string;
   note_ru: string | null;
-  note_en: string | null;
   icon: string;
   position: number;
 }
@@ -16,9 +14,7 @@ export interface Product {
   category_id: number;
   code: string;
   name_ru: string;
-  name_en: string;
   description_ru: string;
-  description_en: string;
   price: number | null;
   price_note: string | null;
   is_active: boolean;
@@ -61,52 +57,38 @@ export interface ContactInfo {
   phone_href: string;
   email: string;
   address_ru: string;
-  address_en: string;
   hours_ru: string;
-  hours_en: string;
   telegram_url: string;
 }
 
 export interface MaterialItem {
   code: string;
   title_ru: string;
-  title_en: string;
   std: string;
 }
 
 export interface ServiceItem {
   num: string;
   title_ru: string;
-  title_en: string;
   body_ru: string;
-  body_en: string;
   list_ru: string[];
-  list_en: string[];
 }
 
 export interface HomeHero {
   kicker_ru: string;
-  kicker_en: string;
   title_ru: string;
-  title_en: string;
   subtitle_ru: string;
-  subtitle_en: string;
 }
 
 export interface AboutIntro {
   badge_ru: string;
-  badge_en: string;
   title_ru: string;
-  title_en: string;
   intro_ru: string;
-  intro_en: string;
 }
 
 export interface SiteSettings {
   topbar_ru: string;
-  topbar_en: string;
   footer_ru: string;
-  footer_en: string;
   telegram_url: string;
   [key: string]: string | undefined;
 }
@@ -136,13 +118,10 @@ export interface PageSection {
   container?: 'wrap' | 'full' | 'narrow';
   bg?: 'default' | 'panel' | 'dark' | 'transparent';
   html_ru: string;
-  html_en?: string;
   padding_top?: number;
   padding_bottom?: number;
   title_ru?: string;
-  title_en?: string;
   subtitle_ru?: string;
-  subtitle_en?: string;
 }
 
 export interface UploadedFile {

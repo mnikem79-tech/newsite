@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { L } from '@/components/L';
 import { ORDER_STATUSES, ORDER_STAT_LABEL } from '@/lib/order-status';
 
 interface Row {
@@ -25,7 +24,7 @@ export default function OrdersFilter({ orders }: { orders: Row[] }) {
     <>
       <div className="a-tabs">
         <button className={status === 'all' ? 'on' : ''} onClick={() => setStatus('all')}>
-          <L ru="Все" en="All" /> ({orders.length})
+          Все ({orders.length})
         </button>
         {ORDER_STATUSES.map((s) => (
           <button key={s} className={status === s ? 'on' : ''} onClick={() => setStatus(s)}>
@@ -38,18 +37,18 @@ export default function OrdersFilter({ orders }: { orders: Row[] }) {
           <thead>
             <tr>
               <th>№</th>
-              <th><L ru="Клиент" en="Client" /></th>
-              <th><L ru="Телефон" en="Phone" /></th>
-              <th><L ru="Товары" en="Items" /></th>
-              <th><L ru="Сумма" en="Total" /></th>
-              <th><L ru="Статус" en="Status" /></th>
-              <th><L ru="Дата" en="Date" /></th>
+              <th>Клиент</th>
+              <th>Телефон</th>
+              <th>Товары</th>
+              <th>Сумма</th>
+              <th>Статус</th>
+              <th>Дата</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {visible.length === 0 && (
-              <tr><td colSpan={8} className="muted"><L ru="Нет заказов с таким статусом." en="No orders with this status." /></td></tr>
+              <tr><td colSpan={8} className="muted">Нет заказов с таким статусом.</td></tr>
             )}
             {visible.map((o) => (
               <tr key={o.id} className="clickable" onClick={() => (window.location.href = `/admin/orders/${o.id}`)}>
@@ -65,7 +64,7 @@ export default function OrdersFilter({ orders }: { orders: Row[] }) {
                 <td className="muted">{new Date(o.created_at).toLocaleString('ru-RU')}</td>
                 <td>
                   <Link href={`/admin/orders/${o.id}`} className="mini-btn" onClick={(e) => e.stopPropagation()}>
-                    <L ru="Открыть" en="Open" />
+                    Открыть
                   </Link>
                 </td>
               </tr>

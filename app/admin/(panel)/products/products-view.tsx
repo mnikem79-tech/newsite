@@ -9,9 +9,7 @@ export interface CategoryItem {
   slug: string;
   code: string;
   name_ru: string;
-  name_en: string;
   note_ru: string | null;
-  note_en: string | null;
   icon: string;
   position: number;
   products_count?: number;
@@ -21,7 +19,6 @@ export interface ProductItem {
   id: number;
   code: string;
   name_ru: string;
-  name_en: string;
   cat_code: string;
   cat_ru: string;
   category_id: number;
@@ -52,9 +49,7 @@ export default function ProductsView({ products, categories: initialCategories }
   const [formCode, setFormCode] = useState('');
   const [formIcon, setFormIcon] = useState('⚡');
   const [formNameRu, setFormNameRu] = useState('');
-  const [formNameEn, setFormNameEn] = useState('');
   const [formNoteRu, setFormNoteRu] = useState('');
-  const [formNoteEn, setFormNoteEn] = useState('');
   const [formPos, setFormPos] = useState(1);
 
   const openAddModal = () => {
@@ -62,9 +57,7 @@ export default function ProductsView({ products, categories: initialCategories }
     setFormCode('');
     setFormIcon('⚡');
     setFormNameRu('');
-    setFormNameEn('');
     setFormNoteRu('');
-    setFormNoteEn('');
     setFormPos(categories.length + 1);
     setErr(null);
     setModalOpen(true);
@@ -75,9 +68,7 @@ export default function ProductsView({ products, categories: initialCategories }
     setFormCode(cat.code || '');
     setFormIcon(cat.icon || '⚡');
     setFormNameRu(cat.name_ru || '');
-    setFormNameEn(cat.name_en || '');
     setFormNoteRu(cat.note_ru || '');
-    setFormNoteEn(cat.note_en || '');
     setFormPos(cat.position || 1);
     setErr(null);
     setModalOpen(true);
@@ -96,9 +87,7 @@ export default function ProductsView({ products, categories: initialCategories }
       code: formCode.trim() || '—',
       icon: formIcon.trim() || '⚡',
       name_ru: formNameRu.trim(),
-      name_en: formNameEn.trim() || formNameRu.trim(),
       note_ru: formNoteRu.trim(),
-      note_en: formNoteEn.trim(),
       position: Number(formPos) || 1,
     };
 
@@ -210,7 +199,6 @@ export default function ProductsView({ products, categories: initialCategories }
                     <td className="mono">{p.code}</td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{p.name_ru}</div>
-                      {p.name_en !== p.name_ru && <div className="muted">{p.name_en}</div>}
                     </td>
                     <td className="muted">{p.cat_code} · {p.cat_ru}</td>
                     <td>
@@ -273,9 +261,6 @@ export default function ProductsView({ products, categories: initialCategories }
                     <td className="mono" style={{ fontWeight: 600 }}>{c.code}</td>
                     <td>
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{c.name_ru}</div>
-                      {c.name_en && c.name_en !== c.name_ru && (
-                        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 2 }}>{c.name_en}</div>
-                      )}
                     </td>
                     <td style={{ fontSize: 12.5, color: 'var(--muted)', maxWidth: 320 }}>
                       {c.note_ru || '—'}
@@ -372,7 +357,7 @@ export default function ProductsView({ products, categories: initialCategories }
               </div>
 
               <div className="field" style={{ marginBottom: 14 }}>
-                <label>Название раздела (RU) *</label>
+                <label>Название раздела *</label>
                 <input
                   value={formNameRu}
                   onChange={(e) => setFormNameRu(e.target.value)}
@@ -381,32 +366,13 @@ export default function ProductsView({ products, categories: initialCategories }
                 />
               </div>
 
-              <div className="field" style={{ marginBottom: 14 }}>
-                <label>Название раздела (EN)</label>
-                <input
-                  value={formNameEn}
-                  onChange={(e) => setFormNameEn(e.target.value)}
-                  placeholder="Например: Power transformers"
-                />
-              </div>
-
-              <div className="field" style={{ marginBottom: 14 }}>
-                <label>Краткое описание (RU) — показывается в карточке на главной и в каталоге</label>
+              <div className="field" style={{ marginBottom: 18 }}>
+                <label>Краткое описание — показывается в карточке на главной и в каталоге</label>
                 <textarea
                   rows={3}
                   value={formNoteRu}
                   onChange={(e) => setFormNoteRu(e.target.value)}
                   placeholder="Краткое описание продукции данного раздела..."
-                />
-              </div>
-
-              <div className="field" style={{ marginBottom: 18 }}>
-                <label>Краткое описание (EN)</label>
-                <textarea
-                  rows={3}
-                  value={formNoteEn}
-                  onChange={(e) => setFormNoteEn(e.target.value)}
-                  placeholder="Short description in English..."
                 />
               </div>
 

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { q } from '@/lib/db';
-import { L } from '@/components/L';
 import { ORDER_STAT_LABEL } from '@/lib/order-status';
 
 export const dynamic = 'force-dynamic';
@@ -22,61 +21,58 @@ export default async function AdminDashboard() {
     <>
       <div className="a-head">
         <div>
-          <h1><L ru="Дашборд" en="Dashboard" /></h1>
-          <div className="sub"><L ru="Сводка по продажам и заявкам" en="Sales & requests overview" /></div>
+          <h1>Дашборд</h1>
+          <div className="sub">Сводка по продажам и заявкам</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/admin/orders" className="btn ghost sm"><L ru="Все заказы" en="All orders" /></Link>
-          <Link href="/admin/products/new" className="btn primary sm">+ <L ru="Товар" en="Product" /></Link>
+          <Link href="/admin/orders" className="btn ghost sm">Все заказы</Link>
+          <Link href="/admin/products/new" className="btn primary sm">+ Товар</Link>
         </div>
       </div>
 
       <div className="kpis">
         <div className="kpi">
-          <div className="l"><L ru="Заказов всего" en="Total orders" /></div>
+          <div className="l">Заказов всего</div>
           <div className="n">{totalOrders}</div>
         </div>
         <div className="kpi">
-          <div className="l"><L ru="Новых" en="New" /></div>
+          <div className="l">Новых</div>
           <div className="n acc">{newOrders}</div>
         </div>
         <div className="kpi">
-          <div className="l"><L ru="В работе" en="In progress" /></div>
+          <div className="l">В работе</div>
           <div className="n gold">{active}</div>
         </div>
         <div className="kpi">
-          <div className="l"><L ru="Сумма заказов" en="Order revenue" /></div>
+          <div className="l">Сумма заказов</div>
           <div className="n green">{new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(revenue)} ₽</div>
         </div>
       </div>
 
       <div className="a-card" style={{ marginBottom: 20 }}>
-        <h3><L ru="Товары в каталоге" en="Products in catalog" /><small>{stats.rows[0]?.products ?? 0} <L ru="позиций" en="items" /></small></h3>
+        <h3>Товары в каталоге<small>{stats.rows[0]?.products ?? 0} позиций</small></h3>
         <div style={{ fontSize: 14.5, color: 'var(--muted)' }}>
-          <L
-            ru="Позиции каталога, разделы и цены управляются в разделе «Товары». Изменения на сайте применяются в течение ~30 секунд."
-            en="Catalog items, sections and prices are managed in the “Products” section. Site changes take effect within ~30 seconds."
-          />
+          Позиции каталога, разделы и цены управляются в разделе «Товары». Изменения на сайте применяются в течение ~30 секунд.
         </div>
       </div>
 
       <div className="a-card">
-        <h3><L ru="Последние заказы" en="Recent orders" /></h3>
+        <h3>Последние заказы</h3>
         <div className="atable-wrap" style={{ border: 0 }}>
           <table className="atable">
             <thead>
               <tr>
                 <th>№</th>
-                <th><L ru="Клиент" en="Client" /></th>
-                <th><L ru="Товары" en="Items" /></th>
-                <th><L ru="Сумма" en="Total" /></th>
-                <th><L ru="Статус" en="Status" /></th>
-                <th><L ru="Дата" en="Date" /></th>
+                <th>Клиент</th>
+                <th>Товары</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Дата</th>
               </tr>
             </thead>
             <tbody>
               {recent.rows.length === 0 && (
-                <tr><td colSpan={6} className="muted"><L ru="Заказов пока нет." en="No orders yet." /></td></tr>
+                <tr><td colSpan={6} className="muted">Заказов пока нет.</td></tr>
               )}
               {recent.rows.map((o) => (
                 <tr key={o.id}>

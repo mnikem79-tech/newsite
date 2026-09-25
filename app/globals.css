@@ -51,9 +51,6 @@ header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(1
 .cartlink:hover{color:var(--txt);background:rgba(255,255,255,.05)}
 .cartlink.active{color:#fff;background:linear-gradient(135deg,var(--acc),#1fb0c4);box-shadow:0 4px 14px var(--acc-glow)}
 .cartlink .badge-n{display:inline-block;background:rgba(255,255,255,.25);border-radius:999px;font-size:11px;padding:1px 7px;font-weight:800;min-width:18px;text-align:center}
-.langbox{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.langbox button{background:transparent;border:0;color:var(--muted);padding:7px 11px;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
-.langbox button.on{background:var(--acc);color:#05202a}
 .btn{display:inline-flex;align-items:center;gap:9px;padding:12px 22px;border-radius:10px;font-weight:800;font-size:14.5px;cursor:pointer;border:0;transition:.18s;color:#04222b}
 .btn.primary,
 .builder-content .btn.primary,
@@ -96,7 +93,6 @@ a.btn.ghost:hover{border-color:var(--acc);color:var(--acc)!important}
   .nav-right{gap:8px;margin-left:auto;justify-content:flex-end;flex-shrink:0}
   .brand .logo-img{height:28px;max-width:120px;object-fit:contain;aspect-ratio:1121/272}
   .cartlink{padding:6px 8px;font-size:14px}
-  .langbox button{padding:4px 7px;font-size:11px}
   .burger{width:38px;height:38px;font-size:18px}
 }
 

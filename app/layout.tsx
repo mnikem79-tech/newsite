@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { LangProvider } from '@/components/L';
 import { CartProvider } from '@/components/CartProvider';
 import RevealAll from '@/components/RevealAll';
 import Header from '@/components/Header';
@@ -17,9 +16,7 @@ export const viewport: Viewport = { themeColor: '#0a1120' };
 
 const FALLBACK_SITE = {
   topbar_ru: 'Пн–Пт 9:00–18:00  ·  +7 (000) 000-00-00  ·  info@newsite.nail-app.ru',
-  topbar_en: 'Mon–Fri 9:00–18:00  ·  +7 (000) 000-00-00  ·  info@newsite.nail-app.ru',
   footer_ru: '© 2026 Новый сайт',
-  footer_en: '© 2026 New Site',
   telegram_url: '',
 };
 const FALLBACK_CONTACTS = {
@@ -27,9 +24,7 @@ const FALLBACK_CONTACTS = {
   phone_href: 'tel:+70000000000',
   email: 'info@newsite.nail-app.ru',
   address_ru: 'Адрес уточняется',
-  address_en: 'Address to be confirmed',
   hours_ru: 'Пн–Пт 9:00–18:00',
-  hours_en: 'Mon–Fri 9:00–18:00',
   telegram_url: '',
 };
 
@@ -44,14 +39,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ru">
       <body>
-        <LangProvider>
-          <CartProvider>
-            <Header site={site} contacts={contacts} />
-            <main>{children}</main>
-            <Footer site={site} contacts={contacts} />
-            <RevealAll />
-          </CartProvider>
-        </LangProvider>
+        <CartProvider>
+          <Header site={site} contacts={contacts} />
+          <main>{children}</main>
+          <Footer site={site} contacts={contacts} />
+          <RevealAll />
+        </CartProvider>
       </body>
     </html>
   );

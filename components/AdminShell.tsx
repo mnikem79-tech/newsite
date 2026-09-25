@@ -2,15 +2,14 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useState } from 'react';
-import { L } from './L';
 
 const LINKS = [
-  { href: '/admin', em: '📊', ru: 'Дашборд', en: 'Dashboard', exact: true },
-  { href: '/admin/products', em: '📦', ru: 'Товары', en: 'Products', exact: false },
-  { href: '/admin/orders', em: '🧾', ru: 'Заказы', en: 'Orders', exact: false },
-  { href: '/admin/content', em: '📝', ru: 'Контент', en: 'Content', exact: false },
-  { href: '/admin/notifications', em: '🔔', ru: 'Оповещения', en: 'Notifications', exact: false },
-  { href: '/admin/users', em: '👥', ru: 'Админы', en: 'Admins', exact: false },
+  { href: '/admin', em: '📊', ru: 'Дашборд', exact: true },
+  { href: '/admin/products', em: '📦', ru: 'Товары', exact: false },
+  { href: '/admin/orders', em: '🧾', ru: 'Заказы', exact: false },
+  { href: '/admin/content', em: '📝', ru: 'Контент', exact: false },
+  { href: '/admin/notifications', em: '🔔', ru: 'Оповещения', exact: false },
+  { href: '/admin/users', em: '👥', ru: 'Админы', exact: false },
 ];
 
 export default function AdminShell({ children }: { children: ReactNode }) {
@@ -40,13 +39,13 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           return (
             <Link key={l.href} href={l.href} className={`al ${on ? 'on' : ''}`}>
               <span className="em">{l.em}</span>
-              <L ru={l.ru} en={l.en} />
+              {l.ru}
             </Link>
           );
         })}
         <div className="a-bottom">
           <Link href="/" className="al">
-            <span className="em">🌐</span> <L ru="Открыть сайт" en="Open site" />
+            <span className="em">🌐</span> Открыть сайт
           </Link>
           <button
             className="al"
@@ -61,7 +60,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             onClick={logout}
             disabled={busy}
           >
-            <span className="em">🚪</span> <L ru="Выйти" en="Log out" />
+            <span className="em">🚪</span> Выйти
           </button>
         </div>
       </aside>

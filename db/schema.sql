@@ -14,9 +14,7 @@ CREATE TABLE IF NOT EXISTS categories (
   slug       TEXT NOT NULL UNIQUE,
   code       TEXT NOT NULL,
   name_ru    TEXT NOT NULL,
-  name_en    TEXT NOT NULL,
   note_ru    TEXT,
-  note_en    TEXT,
   icon       TEXT NOT NULL DEFAULT '⚡',
   position   INTEGER NOT NULL DEFAULT 0
 );
@@ -27,9 +25,7 @@ CREATE TABLE IF NOT EXISTS products (
   category_id     INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
   code            TEXT NOT NULL,
   name_ru         TEXT NOT NULL,
-  name_en         TEXT NOT NULL,
   description_ru  TEXT NOT NULL DEFAULT '',
-  description_en  TEXT NOT NULL DEFAULT '',
   price           NUMERIC(12,2),
   price_note      TEXT,
   is_active       BOOLEAN NOT NULL DEFAULT TRUE,

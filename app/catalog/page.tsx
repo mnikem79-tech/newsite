@@ -13,7 +13,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
     const cr = await q('SELECT * FROM categories ORDER BY position');
     categories = cr.rows;
     const pr = await q(
-      `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru, c.name_en AS cat_en
+      `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru
        FROM products p JOIN categories c ON c.id = p.category_id
        WHERE p.is_active = TRUE ORDER BY c.position, p.position`
     );

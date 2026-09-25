@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { L } from '@/components/L';
 import type { PageSection, UploadedFile } from '@/lib/types';
 import { getDefaultSections } from '@/lib/default-sections';
 
@@ -47,7 +46,7 @@ export function getFileMeta(name: string, mime?: string) {
   return { ext: ext.toUpperCase(), isImage, icon, typeLabel };
 }
 
-const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }[] = [
+const TEMPLATES: { label: string; desc: string; htmlRu: string }[] = [
   {
     label: '⚡ Главный экран (Hero с фоном и цифрами)',
     desc: 'Главный экран сайта: фоновая картинка, заголовок с градиентом, кнопки и 3 блока показателей',
@@ -68,23 +67,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
     </div>
   </div>
 </div>`,
-    htmlEn: `<div class="hero align-top" style="min-height: 540px;">
-  <div class="bgimg" style="background-image: url('/img-2.jpg');"></div>
-  <div class="wrap" style="padding-top: 36px; padding-bottom: 50px;">
-    <div class="kicker">⚡ Research & Production Association</div>
-    <h1>Reactive power compensation <span>and reliable power equipment</span></h1>
-    <p>We manufacture and supply power equipment from 230 V to 220 kV, import products from friendly countries and provide engineering services — from calculations to commissioning.</p>
-    <div class="cta">
-      <a href="/catalog" class="btn primary"><span>View catalog</span> →</a>
-      <a href="/contacts" class="btn ghost">Send a request</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="n">230 <b>V</b> – <b>220</b> <b>kV</b></div><div class="l">Capacitor unit voltage range</div></div>
-      <div class="stat"><div class="n">9</div><div class="l">Product catalog sections</div></div>
-      <div class="stat"><div class="n">5+</div><div class="l">Engineering service types</div></div>
-    </div>
-  </div>
-</div>`,
   },
   {
     label: '🧭 Блок навигации (Заголовок страницы)',
@@ -95,14 +77,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
     <div class="kick">Раздел</div>
     <h1>Заголовок страницы</h1>
     <p>Краткое описание назначения страницы или раздела сайта.</p>
-  </div>
-</div>`,
-    htmlEn: `<div class="pagehead">
-  <div class="wrap">
-    <div class="crumb"><a href="/">Home</a> / <span>Page title</span></div>
-    <div class="kick">Section</div>
-    <h1>Page headline</h1>
-    <p>Short description of this page or section.</p>
   </div>
 </div>`,
   },
@@ -125,24 +99,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
   <div class="figure">
     <img src="/img-3.jpg" alt="Фото" />
     <div class="cap">Подпись к фотографии</div>
-  </div>
-</div>`,
-    htmlEn: `<div class="two">
-  <div>
-    <div class="badge">New section</div>
-    <h2 class="sec">Section headline</h2>
-    <p class="lead" style="margin-top: 16px;">
-      Enter description text here. This layout automatically adapts to any smartphone or desktop screen.
-    </p>
-    <div class="feat-list" style="margin-top: 20px;">
-      <div class="feat"><div class="chk">✓</div><p>First key advantage</p></div>
-      <div class="feat"><div class="chk">✓</div><p>Second key advantage</p></div>
-      <div class="feat"><div class="chk">✓</div><p>High quality and reliability</p></div>
-    </div>
-  </div>
-  <div class="figure">
-    <img src="/img-3.jpg" alt="Photo" />
-    <div class="cap">Photo caption</div>
   </div>
 </div>`,
   },
@@ -169,26 +125,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
     <p>Описание третьего решения. Гарантийное и сервисное обслуживание на объектах.</p>
   </div>
 </div>`,
-    htmlEn: `<div class="shead">
-  <div>
-    <div class="kick">Advantages</div>
-    <h2 class="sec">Our solutions</h2>
-  </div>
-</div>
-<div class="grid g3">
-  <div class="card">
-    <div class="chd"><div class="ic">⚡</div><h3>Solution 1</h3></div>
-    <p>Description of the first solution. The card adjusts smoothly across all devices.</p>
-  </div>
-  <div class="card">
-    <div class="chd"><div class="ic">🛡️</div><h3>Solution 2</h3></div>
-    <p>Description of the second solution. High reliability and operational lifetime.</p>
-  </div>
-  <div class="card">
-    <div class="chd"><div class="ic">⚙️</div><h3>Solution 3</h3></div>
-    <p>Description of the third solution. Warranty and service support.</p>
-  </div>
-</div>`,
   },
   {
     label: '📄 Блок скачивания документов',
@@ -209,22 +145,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
   </div>
   <a href="/contacts" class="btn primary">Скачать форму ↓</a>
 </div>`,
-    htmlEn: `<div class="shead">
-  <div>
-    <div class="kick">Documentation</div>
-    <h2 class="sec">Files for download</h2>
-  </div>
-</div>
-<div class="card doc-card">
-  <div class="chd">
-    <div class="ic">📘</div>
-    <div>
-      <h3>Questionnaire and specifications</h3>
-      <p style="margin: 0; font-size: 13px; color: var(--muted2);">DOCX document · Click to download</p>
-    </div>
-  </div>
-  <a href="/contacts" class="btn primary">Download file ↓</a>
-</div>`,
   },
   {
     label: '📣 Баннер с призывом (CTA)',
@@ -236,13 +156,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
   </div>
   <a href="/contacts" class="btn primary">Получить консультацию →</a>
 </div>`,
-    htmlEn: `<div class="cta-strip">
-  <div>
-    <h3>Have questions or need calculations?</h3>
-    <p>Contact our engineers to select equipment matching your project specifications.</p>
-  </div>
-  <a href="/contacts" class="btn primary">Get consultation →</a>
-</div>`,
   },
   {
     label: '💻 Свободный HTML-блок',
@@ -250,10 +163,6 @@ const TEMPLATES: { label: string; desc: string; htmlRu: string; htmlEn: string }
     htmlRu: `<div>
   <h2>Заголовок</h2>
   <p>Произвольный текст или HTML-код.</p>
-</div>`,
-    htmlEn: `<div>
-  <h2>Title</h2>
-  <p>Custom text or HTML code.</p>
 </div>`,
   },
 ];
@@ -288,7 +197,6 @@ export default function ContentEditor({ initial }: Props) {
 
   // Device switcher for preview: 'desktop' | 'tablet' | 'mobile'
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [langTab, setLangTab] = useState<'ru' | 'en'>('ru');
 
   // Media Library states
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -435,7 +343,6 @@ export default function ContentEditor({ initial }: Props) {
       padding_top: isNav ? 46 : isFullWidth ? 0 : undefined,
       padding_bottom: isNav ? 26 : isFullWidth ? 0 : undefined,
       html_ru: tpl.htmlRu,
-      html_en: tpl.htmlEn,
     };
     setSectionsByPage((prev) => ({
       ...prev,
@@ -455,11 +362,11 @@ export default function ContentEditor({ initial }: Props) {
   // Insert snippet or file into HTML textarea
   const insertHtmlSnippet = (snippet: string) => {
     if (!activeSection) return;
-    const current = langTab === 'ru' ? activeSection.html_ru : (activeSection.html_en || '');
+    const current = activeSection.html_ru;
     const updated = current + '\n\n' + snippet;
     updateActiveSection((s) => ({
       ...s,
-      [langTab === 'ru' ? 'html_ru' : 'html_en']: updated,
+      html_ru: updated,
     }));
   };
 
@@ -489,7 +396,6 @@ export default function ContentEditor({ initial }: Props) {
     updateActiveSection((s) => ({
       ...s,
       html_ru: replaceBg(s.html_ru),
-      html_en: s.html_en ? replaceBg(s.html_en) : s.html_en,
     }));
     setShowFilePicker(false);
     setOk('Фоновая картинка обновлена!');
@@ -964,34 +870,6 @@ export default function ContentEditor({ initial }: Props) {
                         </button>
                       </div>
 
-                      {/* Language Tabs */}
-                      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                        <button
-                          type="button"
-                          className={`mini-btn ${langTab === 'ru' ? 'on' : ''}`}
-                          style={{
-                            background: langTab === 'ru' ? 'var(--acc)' : undefined,
-                            color: langTab === 'ru' ? '#05202a' : undefined,
-                            borderColor: langTab === 'ru' ? 'var(--acc)' : undefined,
-                          }}
-                          onClick={() => setLangTab('ru')}
-                        >
-                          🇷🇺 Русский язык (RU)
-                        </button>
-                        <button
-                          type="button"
-                          className={`mini-btn ${langTab === 'en' ? 'on' : ''}`}
-                          style={{
-                            background: langTab === 'en' ? 'var(--acc)' : undefined,
-                            color: langTab === 'en' ? '#05202a' : undefined,
-                            borderColor: langTab === 'en' ? 'var(--acc)' : undefined,
-                          }}
-                          onClick={() => setLangTab('en')}
-                        >
-                          🇬🇧 English (EN) {activeSection.html_en ? '✓' : '(опционально)'}
-                        </button>
-                      </div>
-
                       {activeSection.id === 'home-hero' && (
                         <div style={{ background: 'rgba(37,195,214,.08)', border: '1px solid rgba(37,195,214,.3)', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: 'var(--txt)', lineHeight: 1.5 }}>
                           💡 <b>Главный экран (Hero):</b> текст расположен вверху благодаря классу <code>align-top</code>. Вы можете свободно менять любые надписи, цифры и кнопки в коде ниже. Чтобы отрегулировать, откуда сверху начинается текст, измените <code>padding-top: 36px</code> во внутреннем блоке <code>&lt;div class="wrap" ...&gt;</code> (например, поставьте <code>20px</code> или <code>50px</code>). Чтобы поменять фоновую фотографию, нажмите кнопку <b>«🌄 Сменить фон»</b> в панели вставки выше.
@@ -1007,18 +885,14 @@ export default function ContentEditor({ initial }: Props) {
                             fontSize: 13.5,
                             lineHeight: 1.5,
                           }}
-                          value={langTab === 'ru' ? activeSection.html_ru : (activeSection.html_en || '')}
+                          value={activeSection.html_ru}
                           onChange={(e) =>
                             updateActiveSection((s) => ({
                               ...s,
-                              [langTab === 'ru' ? 'html_ru' : 'html_en']: e.target.value,
+                              html_ru: e.target.value,
                             }))
                           }
-                          placeholder={
-                            langTab === 'ru'
-                              ? 'Вставьте HTML-разметку или текст...'
-                              : 'Английская версия (если оставить пустой, будет использоваться русская)...'
-                          }
+                          placeholder="Вставьте HTML-разметку или текст..."
                         />
                       </div>
 
@@ -1072,10 +946,7 @@ export default function ContentEditor({ initial }: Props) {
                                 ['--ph-pb-m' as string]: `${Math.min(activeSection.padding_bottom ?? 26, 20)}px`,
                               }}
                               dangerouslySetInnerHTML={{
-                                __html:
-                                  langTab === 'ru'
-                                    ? activeSection.html_ru
-                                    : (activeSection.html_en || activeSection.html_ru),
+                                __html: activeSection.html_ru,
                               }}
                             />
                           </div>
@@ -1085,42 +956,22 @@ export default function ContentEditor({ initial }: Props) {
                   ) : (
                     <div style={{ padding: '16px 0', borderTop: '1px solid var(--line)', marginTop: 16 }}>
                       <h4 style={{ fontSize: 14, marginBottom: 12 }}>Настройка заголовков блока на сайте</h4>
-                      <div className="frow" style={{ marginBottom: 14 }}>
-                        <div className="field">
-                          <label>Заголовок блока на сайте (RU)</label>
-                          <input
-                            value={activeSection.title_ru ?? ''}
-                            placeholder={activeSection.name}
-                            onChange={(e) => updateActiveSection((s) => ({ ...s, title_ru: e.target.value }))}
-                          />
-                        </div>
-                        <div className="field">
-                          <label>Заголовок блока на сайте (EN)</label>
-                          <input
-                            value={activeSection.title_en ?? ''}
-                            placeholder="English title..."
-                            onChange={(e) => updateActiveSection((s) => ({ ...s, title_en: e.target.value }))}
-                          />
-                        </div>
+                      <div className="field" style={{ marginBottom: 14 }}>
+                        <label>Заголовок блока на сайте</label>
+                        <input
+                          value={activeSection.title_ru ?? ''}
+                          placeholder={activeSection.name}
+                          onChange={(e) => updateActiveSection((s) => ({ ...s, title_ru: e.target.value }))}
+                        />
                       </div>
                       {activeSection.type === 'catalog_grid' && (
-                        <div className="frow" style={{ marginBottom: 14 }}>
-                          <div className="field">
-                            <label>Подзаголовок блока (RU)</label>
-                            <input
-                              value={activeSection.subtitle_ru ?? ''}
-                              placeholder="Разделы каталога и типовые серии"
-                              onChange={(e) => updateActiveSection((s) => ({ ...s, subtitle_ru: e.target.value }))}
-                            />
-                          </div>
-                          <div className="field">
-                            <label>Подзаголовок блока (EN)</label>
-                            <input
-                              value={activeSection.subtitle_en ?? ''}
-                              placeholder="Catalog categories & series"
-                              onChange={(e) => updateActiveSection((s) => ({ ...s, subtitle_en: e.target.value }))}
-                            />
-                          </div>
+                        <div className="field" style={{ marginBottom: 14 }}>
+                          <label>Подзаголовок блока</label>
+                          <input
+                            value={activeSection.subtitle_ru ?? ''}
+                            placeholder="Разделы каталога и типовые серии"
+                            onChange={(e) => updateActiveSection((s) => ({ ...s, subtitle_ru: e.target.value }))}
+                          />
                         </div>
                       )}
                       <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8 }}>
@@ -1277,25 +1128,13 @@ export default function ContentEditor({ initial }: Props) {
       {mainMode === 'site' && (
         <form className="aform" onSubmit={saveSiteAndContacts}>
           <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>Общие настройки шапки и подвала</h3>
-          <div className="frow">
-            <div className="field">
-              <label>Верхняя полоска (RU)</label>
-              <input value={site?.topbar_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), topbar_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Верхняя полоска (EN)</label>
-              <input value={site?.topbar_en ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), topbar_en: e.target.value }))} />
-            </div>
+          <div className="field">
+            <label>Верхняя полоска</label>
+            <input value={site?.topbar_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), topbar_ru: e.target.value }))} />
           </div>
-          <div className="frow">
-            <div className="field">
-              <label>Текст в подвале (RU)</label>
-              <input value={site?.footer_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), footer_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Текст в подвале (EN)</label>
-              <input value={site?.footer_en ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), footer_en: e.target.value }))} />
-            </div>
+          <div className="field">
+            <label>Текст в подвале</label>
+            <input value={site?.footer_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), footer_ru: e.target.value }))} />
           </div>
           <div className="field">
             <label>Ссылка на Telegram</label>
@@ -1308,59 +1147,38 @@ export default function ContentEditor({ initial }: Props) {
           </p>
           <div className="frow">
             <div className="field">
-              <label>Раздел «Главная» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_home_ru ?? ''} placeholder="Главная" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_home_ru: e.target.value }))} />
-                <input value={site?.nav_home_en ?? ''} placeholder="Home" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_home_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Главная»</label>
+              <input value={site?.nav_home_ru ?? ''} placeholder="Главная" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_home_ru: e.target.value }))} />
             </div>
             <div className="field">
-              <label>Раздел «О нас» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_about_ru ?? ''} placeholder="О нас" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_about_ru: e.target.value }))} />
-                <input value={site?.nav_about_en ?? ''} placeholder="About" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_about_en: e.target.value }))} />
-              </div>
+              <label>Раздел «О нас»</label>
+              <input value={site?.nav_about_ru ?? ''} placeholder="О нас" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_about_ru: e.target.value }))} />
             </div>
           </div>
           <div className="frow">
             <div className="field">
-              <label>Раздел «Каталог» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_catalog_ru ?? ''} placeholder="Каталог" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_catalog_ru: e.target.value }))} />
-                <input value={site?.nav_catalog_en ?? ''} placeholder="Catalog" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_catalog_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Каталог»</label>
+              <input value={site?.nav_catalog_ru ?? ''} placeholder="Каталог" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_catalog_ru: e.target.value }))} />
             </div>
             <div className="field">
-              <label>Раздел «Производство» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_production_ru ?? ''} placeholder="Производство" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_production_ru: e.target.value }))} />
-                <input value={site?.nav_production_en ?? ''} placeholder="Production" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_production_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Производство»</label>
+              <input value={site?.nav_production_ru ?? ''} placeholder="Производство" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_production_ru: e.target.value }))} />
             </div>
           </div>
           <div className="frow">
             <div className="field">
-              <label>Раздел «Услуги» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_services_ru ?? ''} placeholder="Услуги" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_services_ru: e.target.value }))} />
-                <input value={site?.nav_services_en ?? ''} placeholder="Services" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_services_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Услуги»</label>
+              <input value={site?.nav_services_ru ?? ''} placeholder="Услуги" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_services_ru: e.target.value }))} />
             </div>
             <div className="field">
-              <label>Раздел «Материалы» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_materials_ru ?? ''} placeholder="Материалы" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_materials_ru: e.target.value }))} />
-                <input value={site?.nav_materials_en ?? ''} placeholder="Materials" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_materials_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Материалы»</label>
+              <input value={site?.nav_materials_ru ?? ''} placeholder="Материалы" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_materials_ru: e.target.value }))} />
             </div>
           </div>
           <div className="frow">
             <div className="field">
-              <label>Раздел «Контакты» (RU / EN)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input value={site?.nav_contacts_ru ?? ''} placeholder="Контакты" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_contacts_ru: e.target.value }))} />
-                <input value={site?.nav_contacts_en ?? ''} placeholder="Contacts" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_contacts_en: e.target.value }))} />
-              </div>
+              <label>Раздел «Контакты»</label>
+              <input value={site?.nav_contacts_ru ?? ''} placeholder="Контакты" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_contacts_ru: e.target.value }))} />
             </div>
           </div>
 
@@ -1385,25 +1203,13 @@ export default function ContentEditor({ initial }: Props) {
               <input value={contacts?.telegram_url ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), telegram_url: e.target.value }))} />
             </div>
           </div>
-          <div className="frow">
-            <div className="field">
-              <label>Адрес (RU)</label>
-              <input value={contacts?.address_ru ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), address_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Адрес (EN)</label>
-              <input value={contacts?.address_en ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), address_en: e.target.value }))} />
-            </div>
+          <div className="field">
+            <label>Адрес</label>
+            <input value={contacts?.address_ru ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), address_ru: e.target.value }))} />
           </div>
-          <div className="frow">
-            <div className="field">
-              <label>Режим работы (RU)</label>
-              <input value={contacts?.hours_ru ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), hours_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Режим работы (EN)</label>
-              <input value={contacts?.hours_en ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), hours_en: e.target.value }))} />
-            </div>
+          <div className="field">
+            <label>Режим работы</label>
+            <input value={contacts?.hours_ru ?? ''} onChange={(e) => setContacts((p) => ({ ...(p ?? {}), hours_ru: e.target.value }))} />
           </div>
 
           <div className="form-actions" style={{ marginTop: 24 }}>
