@@ -1,15 +1,17 @@
 /**
  * app/api/auth/login/route.ts
  *
- * ИЗМЕНЕНО: логин и пароль берутся из .env.production
- * (ADMIN_EMAIL / ADMIN_PASSWORD). Запрос к таблице users убран —
- * вход работает даже если PostgreSQL недоступен.
+ * Два способа входа:
+ * 1. Супер-админ из .env.production (ADMIN_EMAIL / ADMIN_PASSWORD).
+ *    Работает всегда, даже если PostgreSQL недоступен.
+ * 2. Администраторы из таблицы users (добавляются в /admin/users).
  *
  * Добавлено: ограничение числа попыток подбора (8 за 10 минут на IP)
  * и логирование неудачных входов.
  */
 import { NextResponse } from 'next/server';
-import { createSessionToken, SESSION_COOKIE, verifyEnvAdmin, envAdminConfig, ENV_ADMIN_ID } from '@/lib/auth';
+import { createSessionToken, SESSION_COOKIE, verifyEnvAdmin, verifyPassword, envAdminConfig, ENV_SESSION_ID } from '@/lib/auth';
+import { q } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,15 +91,41 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'email and password required' }, { status: 400 });
   }
 
-  if (!verifyEnvAdmin(email, password)) {
+  let loginName: string | null = null;
+  let sessionUid: number | null = null;
+  let via: 'env' | 'db' = 'env';
+
+  // Способ 1: супер-админ из .env.production (работает без базы).
+  if (verifyEnvAdmin(email, password)) {
+    loginName = cfg.name;
+    sessionUid = ENV_SESSION_ID;
+  } else {
+    // Способ 2: администраторы из таблицы users.
+    try {
+      const r = await q(
+        'SELECT id, password_hash, display_name FROM users WHERE lower(email) = lower($1) LIMIT 1',
+        [email]
+      );
+      const u = r.rows[0];
+      if (u && verifyPassword(password, String(u.password_hash || ''))) {
+        loginName = String(u.display_name || '').trim() || email;
+        sessionUid = Number(u.id);
+        via = 'db';
+      }
+    } catch (e) {
+      console.error('[auth] проверка по базе недоступна:', e);
+    }
+  }
+
+  if (!loginName || !sessionUid) {
     registerFailure(ip);
     console.warn(`[auth] неудачный вход: ${email} с ${ip}`);
     return NextResponse.json({ error: 'wrong email or password' }, { status: 401 });
   }
 
   attempts.delete(ip);
-  const token = createSessionToken(ENV_ADMIN_ID);
-  const res = NextResponse.json({ ok: true, name: cfg.name });
+  const token = createSessionToken(sessionUid);
+  const res = NextResponse.json({ ok: true, name: loginName });
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
@@ -107,6 +135,6 @@ export async function POST(req: Request) {
     // редиректит на https:// — тогда cookie не уйдёт по незащищённому соединению.
     secure: (process.env.ADMIN_COOKIE_SECURE || '').toLowerCase() === 'true',
   });
-  console.log(`[auth] вход выполнен: ${email} с ${ip}`);
+  console.log(`[auth] вход выполнен: ${email} с ${ip} (через ${via === 'env' ? '.env' : 'базу'})`);
   return res;
 }

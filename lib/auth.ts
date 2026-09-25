@@ -48,6 +48,13 @@ export function verifyPassword(pw: string, stored: string): boolean {
  */
 export const ENV_ADMIN_ID = Number(process.env.ADMIN_ID || 1) || 1;
 
+/**
+ * id сессии для входа через .env (супер-админ сервера).
+ * −1 специально: не пересекается с id из таблицы users,
+ * поэтому защита «нельзя удалить себя» работает корректно.
+ */
+export const ENV_SESSION_ID = -1;
+
 /** Сравнение без утечки по времени: хэшируем оба значения до одинаковой длины. */
 function safeEqual(a: string, b: string): boolean {
   const ha = crypto.createHash('sha256').update(String(a ?? ''), 'utf8').digest();

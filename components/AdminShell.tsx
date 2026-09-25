@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/admin/orders', em: '🧾', ru: 'Заказы', en: 'Orders', exact: false },
   { href: '/admin/content', em: '📝', ru: 'Контент', en: 'Content', exact: false },
   { href: '/admin/notifications', em: '🔔', ru: 'Оповещения', en: 'Notifications', exact: false },
+  { href: '/admin/users', em: '👥', ru: 'Админы', en: 'Admins', exact: false },
 ];
 
 export default function AdminShell({ children }: { children: ReactNode }) {
@@ -28,7 +29,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     <div className="admin-shell">
       <aside className="admin-side">
         <div className="a-brand">
-          <div className="lg">К</div>
+          <div className="lg">Н</div>
           <div className="tt">
             Новый сайт
             <small>админ-панель</small>
