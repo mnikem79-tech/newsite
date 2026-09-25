@@ -1,0 +1,49 @@
+# ====== СЕКРЕТЫ: никогда не коммитить ======
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*
+.netrc
+.npmrc
+.git-credentials
+credentials*.json
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+*.bak.*
+*.delme*
+*.log
+# ====== Служебное ======
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+.turbo/
+.vercel/
+*.tgz
+*.zip
+*.tar.gz
+.DS_Store
+
+# ====== Пользовательские загрузки (хранятся локально на сервере в одной папке) ======
+public/uploads/*
+!public/uploads/.gitkeep
+
+# ====== Резервные копии и мусор редакторов (не коммитить) ======
+*.before
+*.orig
+*.rej
+*.old
+*.diff
+*.tsbuildinfo
+delme/
