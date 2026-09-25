@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 
 const secret = () => {
   const s = process.env.SESSION_SECRET;
-  if (!s) throw new Error('SESSION_SECRET не задан: добавьте его в /opt/kiprol/app/.env.production');
+  if (!s) throw new Error('SESSION_SECRET не задан: добавьте его в .env.production');
   return s;
 };
 
@@ -88,7 +88,7 @@ export function verifyEnvAdmin(email: string, password: string): boolean {
 /* Сессии — БЕЗ ИЗМЕНЕНИЙ                                             */
 /* ------------------------------------------------------------------ */
 
-export const SESSION_COOKIE = 'kiprol_session';
+export const SESSION_COOKIE = 'newsite_session';
 
 export function createSessionToken(userId: number): string {
   const exp = Date.now() + 7 * 24 * 3600 * 1000;

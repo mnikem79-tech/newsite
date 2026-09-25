@@ -67,7 +67,7 @@ export async function notifyNewOrder(
     console.error('[Notification] Error reading VK config:', err);
   }
 
-  // 3. Corporate Email (zakaz@kiprol.ru via bots/mail)
+  // 3. Corporate Email (zakaz@newsite.nail-app.ru via bots/mail)
   try {
     const mailConfig = await getMailConfig();
     const hasMailRecipients = mailConfig.recipients.some((r) => r.enabled !== false && r.email.trim());

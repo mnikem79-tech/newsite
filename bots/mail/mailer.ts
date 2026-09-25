@@ -6,12 +6,12 @@ import { formatEmailHtml, formatEmailText } from './templates';
 
 export async function getMailConfig(): Promise<MailConfig> {
   let enabled = true;
-  let host = (process.env.MAIL_HOST || process.env.SMTP_HOST || 'mail.kiprol.ru').trim();
+  let host = (process.env.MAIL_HOST || process.env.SMTP_HOST || 'mail.newsite.nail-app.ru').trim();
   let port = Number(process.env.MAIL_PORT || process.env.SMTP_PORT) || 465;
   let secure = process.env.MAIL_SECURE === 'true' || port === 465;
-  let user = (process.env.MAIL_USER || process.env.SMTP_USER || 'zakaz@kiprol.ru').trim();
+  let user = (process.env.MAIL_USER || process.env.SMTP_USER || 'zakaz@newsite.nail-app.ru').trim();
   let pass = (process.env.MAIL_PASS || process.env.SMTP_PASS || '').trim();
-  let from = (process.env.MAIL_FROM || process.env.SMTP_FROM || 'НПО КИПРОЛ <zakaz@kiprol.ru>').trim();
+  let from = (process.env.MAIL_FROM || process.env.SMTP_FROM || 'Новый сайт <zakaz@newsite.nail-app.ru>').trim();
   let recipients: EmailRecipient[] = [];
 
   try {
@@ -71,13 +71,13 @@ export async function sendMailMessage(
   configOverride?: Partial<MailConfig>
 ): Promise<{ ok: boolean; error?: string }> {
   const cfg = await getMailConfig();
-  const host = (configOverride?.host || cfg.host || 'mail.kiprol.ru').trim();
+  const host = (configOverride?.host || cfg.host || 'mail.newsite.nail-app.ru').trim();
   const port = Number(configOverride?.port || cfg.port || 465);
   const secure =
     configOverride?.secure !== undefined ? configOverride.secure : port === 465;
-  const user = (configOverride?.user || cfg.user || 'zakaz@kiprol.ru').trim();
+  const user = (configOverride?.user || cfg.user || 'zakaz@newsite.nail-app.ru').trim();
   const pass = (configOverride?.pass || cfg.pass || '').trim();
-  const from = (configOverride?.from || cfg.from || 'НПО КИПРОЛ <zakaz@kiprol.ru>').trim();
+  const from = (configOverride?.from || cfg.from || 'Новый сайт <zakaz@newsite.nail-app.ru>').trim();
 
   if (!to || !to.includes('@')) {
     return { ok: false, error: 'Некорректный email получателя' };
@@ -92,7 +92,7 @@ export async function sendMailMessage(
       greetingTimeout: 10000,
       socketTimeout: 15000,
       tls: {
-        rejectUnauthorized: false, // Allows self-signed or host-named certificates on mail.kiprol.ru
+        rejectUnauthorized: false, // Allows self-signed or host-named certificates on mail.newsite.nail-app.ru
       },
     };
 
@@ -136,7 +136,7 @@ export async function sendMailNotification(
   const isOrder = Array.isArray(data.items) && data.items.length > 0;
   const subject = isOrder
     ? `🛒 Новый заказ ${data.number}: ${data.name}`
-    : `🔔 Новая заявка с сайта kiprol.ru: ${data.name} (${data.phone})`;
+    : `🔔 Новая заявка с сайта newsite.nail-app.ru: ${data.name} (${data.phone})`;
 
   const html = formatEmailHtml(data);
   const text = formatEmailText(data);
@@ -172,30 +172,30 @@ export async function testMail(
   total?: number;
   details?: Record<string, { ok: boolean; error?: string }>;
 }> {
-  const fromAddress = configOverride?.from || 'zakaz@kiprol.ru';
-  const subject = '✅ Тестовое оповещение от сайта kiprol.ru';
+  const fromAddress = configOverride?.from || 'zakaz@newsite.nail-app.ru';
+  const subject = '✅ Тестовое оповещение от сайта newsite.nail-app.ru';
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; color: #1e293b;">
       <div style="background: #0b1322; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-        <h2 style="color: #25c3d6; margin: 0; font-size: 20px; letter-spacing: 0.5px;">НПО КИПРОЛ</h2>
+        <h2 style="color: #25c3d6; margin: 0; font-size: 20px; letter-spacing: 0.5px;">Новый сайт</h2>
         <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Служба email-оповещений (${fromAddress})</div>
       </div>
       <h3 style="color: #10b981; margin-top: 0;">✅ Тестовое письмо успешно доставлено!</h3>
       <p style="font-size: 14.5px; line-height: 1.6; color: #334155;">
-        Почтовая служба сайта <b>kiprol.ru</b> успешно настроена. Отправка выполняется с адреса <b>${fromAddress}</b>.
+        Почтовая служба сайта <b>newsite.nail-app.ru</b> успешно настроена. Отправка выполняется с адреса <b>${fromAddress}</b>.
       </p>
       <p style="font-size: 14px; line-height: 1.6; color: #64748b;">
         Все новые заявки и заказы с сайта будут автоматически приходить на указанные в панели управления адреса сотрудников.
       </p>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
       <div style="font-size: 12px; color: #94a3b8; text-align: center;">
-        НПО КИПРОЛ • г. Тольятти • <a href="https://kiprol.ru" style="color: #25c3d6; text-decoration: none;">kiprol.ru</a>
+        Новый сайт • <a href="https://newsite.nail-app.ru" style="color: #25c3d6; text-decoration: none;">newsite.nail-app.ru</a>
       </div>
     </div>
   `;
   const text =
-    '✅ Тестовое оповещение от сайта kiprol.ru\n\n' +
-    `Почтовая служба сайта kiprol.ru успешно настроена!\n` +
+    '✅ Тестовое оповещение от сайта newsite.nail-app.ru\n\n' +
+    `Почтовая служба сайта newsite.nail-app.ru успешно настроена!\n` +
     `Письмо отправлено с адреса ${fromAddress}.\n` +
     'Все новые заказы и заявки с сайта будут приходить сюда в реальном времени.';
 

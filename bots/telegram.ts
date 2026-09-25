@@ -90,7 +90,7 @@ export async function getTelegramConfig(): Promise<TelegramConfig> {
 
 export function formatTelegramMessage(data: OrderNotificationData): string {
   const isOrder = Array.isArray(data.items) && data.items.length > 0;
-  const title = isOrder ? '🛒 <b>Новый заказ с сайта kiprol.ru</b>' : '🔔 <b>Новая заявка с сайта kiprol.ru</b>';
+  const title = isOrder ? '🛒 <b>Новый заказ с сайта newsite.nail-app.ru</b>' : '🔔 <b>Новая заявка с сайта newsite.nail-app.ru</b>';
 
   const lines: string[] = [
     title,
@@ -133,7 +133,7 @@ export function formatTelegramMessage(data: OrderNotificationData): string {
 
   if (data.id) {
     lines.push('');
-    lines.push(`🔗 <a href="https://kiprol.ru/admin/orders/${data.id}">Открыть заказ в админке</a>`);
+    lines.push(`🔗 <a href="https://newsite.nail-app.ru/admin/orders/${data.id}">Открыть заказ в админке</a>`);
   }
 
   return lines.join('\n');
@@ -309,8 +309,8 @@ export async function testTelegram(
   recipientsList?: BotRecipient[]
 ): Promise<{ ok: boolean; error?: string; sent?: number; total?: number; details?: Record<string, { ok: boolean; error?: string }> }> {
   const text =
-    '✅ <b>Тестовое оповещение от Kiprol Bot</b>\n\n' +
-    'Связь между сайтом <code>kiprol.ru</code> и Telegram успешно настроена! ' +
+    '✅ <b>Тестовое оповещение от Newsite Bot</b>\n\n' +
+    'Связь между сайтом <code>newsite.nail-app.ru</code> и Telegram успешно настроена! ' +
     'Новые заявки и заказы будут приходить сюда в реальном времени.';
 
   // If testing a single recipient

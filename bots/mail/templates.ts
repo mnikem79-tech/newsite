@@ -13,7 +13,7 @@ function formatPrice(n: number): string {
 
 export function formatEmailHtml(data: OrderNotificationData): string {
   const isOrder = Array.isArray(data.items) && data.items.length > 0;
-  const title = isOrder ? 'Новый заказ с сайта kiprol.ru' : 'Новая заявка с сайта kiprol.ru';
+  const title = isOrder ? 'Новый заказ с сайта newsite.nail-app.ru' : 'Новая заявка с сайта newsite.nail-app.ru';
 
   let itemsHtml = '';
   if (isOrder && data.items && data.items.length > 0) {
@@ -93,7 +93,7 @@ export function formatEmailHtml(data: OrderNotificationData): string {
   const adminLink = data.id
     ? `
       <div style="margin-top: 24px; text-align: center;">
-        <a href="https://kiprol.ru/admin/orders/${data.id}" style="display: inline-block; background: #0284c7; color: #ffffff; padding: 12px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none;">
+        <a href="https://newsite.nail-app.ru/admin/orders/${data.id}" style="display: inline-block; background: #0284c7; color: #ffffff; padding: 12px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none;">
           Открыть заказ в панели управления →
         </a>
       </div>
@@ -137,7 +137,7 @@ export function formatEmailHtml(data: OrderNotificationData): string {
 
           <!-- Footer -->
           <div style="background: #f1f5f9; padding: 16px 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
-            НПО КИПРОЛ • г. Тольятти • <a href="https://kiprol.ru" style="color: #0284c7; text-decoration: none;">kiprol.ru</a>
+            Новый сайт • <a href="https://newsite.nail-app.ru" style="color: #0284c7; text-decoration: none;">newsite.nail-app.ru</a>
           </div>
         </div>
       </body>
@@ -147,7 +147,7 @@ export function formatEmailHtml(data: OrderNotificationData): string {
 
 export function formatEmailText(data: OrderNotificationData): string {
   const isOrder = Array.isArray(data.items) && data.items.length > 0;
-  const title = isOrder ? 'НОВЫЙ ЗАКАЗ С САЙТА KIPROL.RU' : 'НОВАЯ ЗАЯВКА С САЙТА KIPROL.RU';
+  const title = isOrder ? 'НОВЫЙ ЗАКАЗ С САЙТА NEWSITE.NAIL-APP.RU' : 'НОВАЯ ЗАЯВКА С САЙТА NEWSITE.NAIL-APP.RU';
 
   const lines: string[] = [
     title,
@@ -180,7 +180,7 @@ export function formatEmailText(data: OrderNotificationData): string {
 
   if (data.id) {
     lines.push('');
-    lines.push(`Админка: https://kiprol.ru/admin/orders/${data.id}`);
+    lines.push(`Админка: https://newsite.nail-app.ru/admin/orders/${data.id}`);
   }
 
   return lines.join('\n');

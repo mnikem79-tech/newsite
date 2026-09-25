@@ -260,7 +260,7 @@ export default function NotificationsClient({ initial }: Props) {
       {/* Top Header */}
       <div className="a-head">
         <div>
-          <h1>🔔 Оповещения (Почта zakaz@kiprol.ru, TG, VK)</h1>
+          <h1>🔔 Оповещения (Почта zakaz@newsite.nail-app.ru, TG, VK)</h1>
           <div className="sub">
             Настройка автоматической рассылки новых заявок и заказов сотрудникам компании
           </div>
@@ -277,7 +277,7 @@ export default function NotificationsClient({ initial }: Props) {
       )}
 
       {/* ========================================================
-          CARD 1: СОБСТВЕННАЯ ПОЧТА (zakaz@kiprol.ru)
+          CARD 1: СОБСТВЕННАЯ ПОЧТА (zakaz@newsite.nail-app.ru)
           ======================================================== */}
       <div className="a-card" style={{ marginBottom: 26 }}>
         <div
@@ -294,10 +294,10 @@ export default function NotificationsClient({ initial }: Props) {
             <span style={{ fontSize: 28 }}>✉️</span>
             <div>
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
-                Корпоративная почта (zakaz@kiprol.ru)
+                Корпоративная почта (zakaz@newsite.nail-app.ru)
               </h3>
               <div style={{ color: 'var(--muted)', fontSize: 13, marginTop: 2 }}>
-                Отправка писем через официальный почтовый сервер reg.ru с адреса zakaz@kiprol.ru (модуль bots/mail)
+                Отправка писем через официальный почтовый сервер reg.ru с адреса zakaz@newsite.nail-app.ru (модуль bots/mail)
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function NotificationsClient({ initial }: Props) {
             <label>Почтовый сервер (хост)</label>
             <input
               value={config.mail_host}
-              placeholder="mail.kiprol.ru"
+              placeholder="mail.newsite.nail-app.ru"
               onChange={(e) => setConfig((p) => ({ ...p, mail_host: e.target.value }))}
             />
           </div>
@@ -367,19 +367,19 @@ export default function NotificationsClient({ initial }: Props) {
             <label>Email отправителя / Логин</label>
             <input
               value={config.mail_user}
-              placeholder="zakaz@kiprol.ru"
+              placeholder="zakaz@newsite.nail-app.ru"
               onChange={(e) =>
                 setConfig((p) => ({
                   ...p,
                   mail_user: e.target.value,
-                  mail_from: p.mail_from || `НПО КИПРОЛ <${e.target.value}>`,
+                  mail_from: p.mail_from || `Новый сайт <${e.target.value}>`,
                 }))
               }
             />
           </div>
           <div className="field">
             <label>
-              Пароль от ящика zakaz@kiprol.ru
+              Пароль от ящика zakaz@newsite.nail-app.ru
               <button
                 type="button"
                 onClick={() => setShowMailPass(!showMailPass)}
@@ -407,7 +407,7 @@ export default function NotificationsClient({ initial }: Props) {
             <label>Имя и адрес в поле «От кого»</label>
             <input
               value={config.mail_from}
-              placeholder="НПО КИПРОЛ <zakaz@kiprol.ru>"
+              placeholder="Новый сайт <zakaz@newsite.nail-app.ru>"
               onChange={(e) => setConfig((p) => ({ ...p, mail_from: e.target.value }))}
             />
           </div>
@@ -425,7 +425,7 @@ export default function NotificationsClient({ initial }: Props) {
             lineHeight: 1.5,
           }}
         >
-          💡 <b>Собственная почта kiprol.ru</b>: порты на хостинге открыты. Письма отправляются с официального адреса <code>zakaz@kiprol.ru</code> через <code>mail.kiprol.ru</code> (порт 465 SSL). Все записи SPF и MX уже привязаны к домену в reg.ru.
+          💡 <b>Собственная почта newsite.nail-app.ru</b>: порты на хостинге открыты. Письма отправляются с официального адреса <code>zakaz@newsite.nail-app.ru</code> через <code>mail.newsite.nail-app.ru</code> (порт 465 SSL). Все записи SPF и MX уже привязаны к домену в reg.ru.
         </div>
 
         {/* Recipients list for Mail */}
@@ -612,7 +612,7 @@ export default function NotificationsClient({ initial }: Props) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 28 }}>✈️</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Telegram (Kiprol Bot)</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Telegram (Newsite Bot)</h3>
               <div style={{ color: 'var(--muted)', fontSize: 13, marginTop: 2 }}>
                 Оповещения в Telegram-бот и группы
               </div>

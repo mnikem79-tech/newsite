@@ -30,7 +30,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         <div className="a-brand">
           <div className="lg">К</div>
           <div className="tt">
-            НПО КИПРОЛ
+            Новый сайт
             <small>админ-панель</small>
           </div>
         </div>

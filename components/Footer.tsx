@@ -4,11 +4,8 @@ import { L, useLang } from './L';
 import type { ContactInfo, SiteSettings } from '@/lib/types';
 
 const CATS = [
-  { href: '/catalog', ru: 'Компенсация реактивной мощности', en: 'Reactive power compensation' },
-  { href: '/catalog', ru: 'Преобразователи', en: 'Converters' },
-  { href: '/catalog', ru: 'Реакторы и дроссели', en: 'Reactors & chokes' },
-  { href: '/catalog', ru: 'Возобновляемые источники', en: 'Renewable energy' },
-  { href: '/catalog', ru: 'Погрузчики и складская техника', en: 'Forklifts & warehouse equipment' },
+  { href: '/catalog', ru: 'Демо-раздел 1', en: 'Demo section 1' },
+  { href: '/catalog', ru: 'Демо-раздел 2', en: 'Demo section 2' },
 ];
 
 export default function Footer({ site, contacts }: { site: SiteSettings; contacts: ContactInfo }) {
@@ -20,12 +17,12 @@ export default function Footer({ site, contacts }: { site: SiteSettings; contact
           <div>
             <div className="brand-row">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img-1.png" alt="НПО КИПРОЛ" style={{ height: 52, width: 'auto' }} />
+              <img src="/img-1.png" alt="Новый сайт" style={{ height: 52, width: 'auto' }} />
             </div>
             <p style={{ fontSize: 13.5, color: 'var(--muted)', maxWidth: 300 }}>
               <L
-                ru="Компенсация реактивной мощности, энергооборудование от 230 В до 220 кВ, импортозамещение и инженерные услуги."
-                en="Reactive power compensation, power equipment 230 V–220 kV, import substitution and engineering services."
+                ru="Демонстрационный сайт: каталог товаров, заказы и конструктор страниц."
+                en="Demo website: product catalog, orders and page builder."
               />
             </p>
           </div>
@@ -60,7 +57,7 @@ export default function Footer({ site, contacts }: { site: SiteSettings; contact
         </div>
         <div className="fcopy">
           <span><L ru={site.footer_ru} en={site.footer_en} /></span>
-          <span style={{ opacity: 0.55, fontSize: 12 }}><L ru="обновление от 17.09.2026" en="updated 17.09.2026" /></span>
+          <span style={{ opacity: 0.55, fontSize: 12 }}><L ru="обновление от 25.09.2026" en="updated 25.09.2026" /></span>
           <span><Link href="/admin"><L ru="Админ-панель" en="Admin panel" /></Link></span>
         </div>
       </div>

@@ -7,12 +7,12 @@ const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: 'r
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>('ru');
   useEffect(() => {
-    const saved = (localStorage.getItem('kiprol-lang') as Lang) || 'ru';
+    const saved = (localStorage.getItem('newsite-lang') as Lang) || 'ru';
     setLangState(saved);
   }, []);
   const setLang = (l: Lang) => {
     setLangState(l);
-    localStorage.setItem('kiprol-lang', l);
+    localStorage.setItem('newsite-lang', l);
   };
   return <Ctx.Provider value={{ lang, setLang }}>{children}</Ctx.Provider>;
 }

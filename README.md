@@ -1,21 +1,32 @@
-# Сайт kiprol.ru (НПО КИПРОЛ)
+# Новый сайт (newsite)
 
-Next.js (App Router), PostgreSQL. Снимок рабочей версии с сервера от 17.09.2026.
+Демо-сайт на готовом движке: Next.js 15 (App Router) + PostgreSQL.
 
-Прод на сервере: каталог `/opt/kiprol/app`, systemd-юнит `kiprol.service` (npm start, 127.0.0.1:3000),
-переменные окружения — из `/opt/kiprol/app/.env.production`.
+Прод на домашнем сервере: каталог `/opt/newsite/app`, systemd-юнит `newsite.service`
+(`npm start`, `0.0.0.0:3002`), переменные окружения — из `/opt/newsite/app/.env.production`.
 
-## Локальный запуск
+Публичный доступ: `https://newsite.nail-app.ru` → VPS Caddy `147.45.211.79`
+→ дом `195.46.191.98:8443` (контейнер `edge`) → `127.0.0.1:3002`.
+
+## Обновление после правок (на домашнем сервере)
+
 ```bash
-npm ci
-cp .env.example .env.local     # заполнить своими значениями
-npm run dev
+cd /opt/newsite/app
+git pull origin main
+npm install
+npm run build
+sudo systemctl restart newsite.service
 ```
 
-## Сборка
+## Очистка контента и повторное заполнение демо
+
 ```bash
-npm run build && npm start
+cd /opt/newsite/app
+sudo -u postgres psql newsite_db -c "TRUNCATE products, order_items, orders, categories, page_content, uploads RESTART IDENTITY CASCADE;"
+node scripts/init-db.js
 ```
 
-Секретов в репозитории нет: значения доступов к БД, ключ сессии и пароль админки лежат только
-на сервере в `.env.production`. В репозитории — только список имён переменных (.env.example).
+Пользователь `users` (админ) при этом сохраняется.
+
+Секретов в репозитории нет: доступы к БД, ключ сессии и пароль админки лежат только
+на сервере в `.env.production`.

@@ -322,14 +322,14 @@ export function SectionRenderer({
                     <YandexMap
                       center={[53.5372, 49.4086]}
                       zoom={12}
-                      titleRu="НПО КИПРОЛ"
-                      titleEn="NPO KIPROL"
+                      titleRu="Новый сайт"
+                      titleEn="New Site"
                       addressRu={contacts.address_ru}
                       addressEn={contacts.address_en}
                     />
                     <div className="mlabel">
                       <span style={{ fontSize: 18 }}>📍</span>
-                      <span><b>НПО КИПРОЛ</b><br /><L ru={contacts.address_ru} en={contacts.address_en} /></span>
+                      <span><b>Новый сайт</b><br /><L ru={contacts.address_ru} en={contacts.address_en} /></span>
                     </div>
                   </div>
                 </div>

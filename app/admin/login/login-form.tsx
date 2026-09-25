@@ -33,7 +33,7 @@ export default function AdminLoginForm() {
     <form onSubmit={submit}>
       <div className="field">
         <label>E-mail</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@kiprol.ru" autoFocus />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@newsite.nail-app.ru" autoFocus />
       </div>
       <div className="field">
         <label>Пароль</label>

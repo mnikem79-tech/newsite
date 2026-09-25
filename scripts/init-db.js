@@ -6,12 +6,17 @@ const crypto = require('node:crypto');
 const { Pool } = require('pg');
 const seed = require('../lib/seed-data');
 
-// --- load .env ---
-const envFile = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envFile)) {
-  for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2];
+// --- load .env (.env.production first, then .env) ---
+const envCandidates = [
+  path.join(__dirname, '..', '.env.production'),
+  path.join(__dirname, '..', '.env'),
+];
+for (const envFile of envCandidates) {
+  if (fs.existsSync(envFile)) {
+    for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (m && !(m[1] in process.env)) process.env[m[1]] = m[2];
+    }
   }
 }
 
@@ -66,12 +71,12 @@ function hashPassword(pw) {
   console.log('✓ page content defaults ensured');
 
   // admin user
-  const email = process.env.ADMIN_EMAIL || 'admin@kiprol.ru';
+  const email = process.env.ADMIN_EMAIL || 'admin@newsite.nail-app.ru';
   const ex = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
   if (!ex.rows.length) {
     const pw = process.env.ADMIN_PASSWORD;
     if (!pw) {
-      console.error('ADMIN_PASSWORD не задан: добавьте его в /opt/kiprol/app/.env.production');
+      console.error('ADMIN_PASSWORD не задан: добавьте его в .env.production');
       process.exit(1);
     }
     await pool.query(

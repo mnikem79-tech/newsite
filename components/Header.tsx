@@ -38,9 +38,9 @@ export default function Header({ site, contacts }: { site: SiteSettings; contact
       </div>
       <header>
         <div className="wrap nav">
-          <Link href="/" className="brand" onClick={() => setOpen(false)} title="НПО КИПРОЛ">
+          <Link href="/" className="brand" onClick={() => setOpen(false)} title="Новый сайт">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img-1.png" alt="НПО КИПРОЛ" className="logo-img" width={1121} height={272} />
+            <img src="/img-1.png" alt="Новый сайт" className="logo-img" width={1121} height={272} />
           </Link>
           <nav className={`menu ${open ? 'open' : ''}`}>
             {DEFAULT_NAV.map((n) => {

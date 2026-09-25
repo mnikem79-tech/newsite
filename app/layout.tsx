@@ -8,29 +8,29 @@ import Footer from '@/components/Footer';
 import { getContacts, getSite } from '@/lib/content';
 
 export const metadata: Metadata = {
-  title: 'НПО КИПРОЛ — Компенсация реактивной мощности и энергооборудование',
+  title: 'Новый сайт',
   description:
-    'Научно-производственное объединение КИПРОЛ: конденсаторные установки 230 В–220 кВ, реакторы, преобразователи, возобновляемые источники, погрузчики и складская техника, запасные части, технические жидкости. Тольятти.',
+    'Демонстрационный сайт на готовом движке: каталог товаров, заказы, конструктор страниц и уведомления.',
 };
 
 export const viewport: Viewport = { themeColor: '#0a1120' };
 
 const FALLBACK_SITE = {
-  topbar_ru: 'Пн–Пт 7:00–17:00 МСК  ·  +7 (927) 212-39-34  ·  info@kiprol.ru',
-  topbar_en: 'Mon–Fri 7:00–17:00 MSK  ·  +7 (927) 212-39-34  ·  info@kiprol.ru',
-  footer_ru: '© 2024 ТМ KIPROL.RU ‖ КИПРОЛ.РФ',
-  footer_en: '© 2024 KIPROL.RU',
-  telegram_url: 'https://t.me/+ib13aD-uEgJlYmUy',
+  topbar_ru: 'Пн–Пт 9:00–18:00  ·  +7 (000) 000-00-00  ·  info@newsite.nail-app.ru',
+  topbar_en: 'Mon–Fri 9:00–18:00  ·  +7 (000) 000-00-00  ·  info@newsite.nail-app.ru',
+  footer_ru: '© 2026 Новый сайт',
+  footer_en: '© 2026 New Site',
+  telegram_url: '',
 };
 const FALLBACK_CONTACTS = {
-  phone: '+7 (927) 212-39-34',
-  phone_href: 'tel:+79272123934',
-  email: 'info@kiprol.ru',
-  address_ru: 'Россия, Самарская область, г. Тольятти, 445045',
-  address_en: 'Russia, Samara region, Tolyatti, 445045',
-  hours_ru: 'Пн–Пт 7:00–17:00 МСК',
-  hours_en: 'Mon–Fri 7:00–17:00 MSK',
-  telegram_url: 'https://t.me/+ib13aD-uEgJlYmUy',
+  phone: '+7 (000) 000-00-00',
+  phone_href: 'tel:+70000000000',
+  email: 'info@newsite.nail-app.ru',
+  address_ru: 'Адрес уточняется',
+  address_en: 'Address to be confirmed',
+  hours_ru: 'Пн–Пт 9:00–18:00',
+  hours_en: 'Mon–Fri 9:00–18:00',
+  telegram_url: '',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

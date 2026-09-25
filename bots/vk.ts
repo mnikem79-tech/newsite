@@ -77,7 +77,7 @@ export async function getVkConfig(): Promise<VkConfig> {
 
 export function formatVkMessage(data: OrderNotificationData): string {
   const isOrder = Array.isArray(data.items) && data.items.length > 0;
-  const title = isOrder ? '🛒 Новый заказ с сайта kiprol.ru' : '🔔 Новая заявка с сайта kiprol.ru';
+  const title = isOrder ? '🛒 Новый заказ с сайта newsite.nail-app.ru' : '🔔 Новая заявка с сайта newsite.nail-app.ru';
 
   const lines: string[] = [
     title,
@@ -120,7 +120,7 @@ export function formatVkMessage(data: OrderNotificationData): string {
 
   if (data.id) {
     lines.push('');
-    lines.push(`🔗 Админка: https://kiprol.ru/admin/orders/${data.id}`);
+    lines.push(`🔗 Админка: https://newsite.nail-app.ru/admin/orders/${data.id}`);
   }
 
   return lines.join('\n');
@@ -228,7 +228,7 @@ export async function testVk(
 ): Promise<{ ok: boolean; error?: string; sent?: number; total?: number; details?: Record<string, { ok: boolean; error?: string }> }> {
   const text =
     '✅ Тестовое оповещение от группы ВКонтакте.\n\n' +
-    'Связь между сайтом kiprol.ru и сообществом ВКонтакте успешно установлена! ' +
+    'Связь между сайтом newsite.nail-app.ru и сообществом ВКонтакте успешно установлена! ' +
     'Новые заявки и заказы будут приходить сюда в реальном времени.';
 
   // If testing single recipient

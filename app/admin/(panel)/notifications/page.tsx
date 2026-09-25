@@ -89,12 +89,12 @@ export default async function AdminNotificationsPage() {
     vk_recipients,
 
     mail_enabled: notif.mail_enabled ?? notif.email_enabled ?? true,
-    mail_host: notif.mail_host || process.env.MAIL_HOST || 'mail.kiprol.ru',
+    mail_host: notif.mail_host || process.env.MAIL_HOST || 'mail.newsite.nail-app.ru',
     mail_port: Number(notif.mail_port || process.env.MAIL_PORT) || 465,
     mail_secure: notif.mail_secure !== undefined ? notif.mail_secure : true,
-    mail_user: notif.mail_user || process.env.MAIL_USER || 'zakaz@kiprol.ru',
+    mail_user: notif.mail_user || process.env.MAIL_USER || 'zakaz@newsite.nail-app.ru',
     mail_pass: notif.mail_pass || process.env.MAIL_PASS || '',
-    mail_from: notif.mail_from || process.env.MAIL_FROM || 'НПО КИПРОЛ <zakaz@kiprol.ru>',
+    mail_from: notif.mail_from || process.env.MAIL_FROM || 'Новый сайт <zakaz@newsite.nail-app.ru>',
     mail_recipients,
   };
 

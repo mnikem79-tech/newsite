@@ -30,7 +30,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('kiprol-cart');
+      const raw = localStorage.getItem('newsite-cart');
       if (raw) setItems(JSON.parse(raw));
     } catch {}
     setLoaded(true);
@@ -38,7 +38,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loaded) return;
-    localStorage.setItem('kiprol-cart', JSON.stringify(items));
+    localStorage.setItem('newsite-cart', JSON.stringify(items));
   }, [items, loaded]);
 
   const showToast = useCallback((msg: string) => {
