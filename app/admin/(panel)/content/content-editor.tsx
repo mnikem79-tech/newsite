@@ -1,8 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import type { PageSection, UploadedFile } from '@/lib/types';
+import type { ChromeBlock, PageSection, UploadedFile } from '@/lib/types';
 import { getDefaultSections } from '@/lib/default-sections';
+import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
+import ChromeEditor from './chrome-editor';
 
 const PAGES = [
   { id: 'home', title: '🏠 Главная' },
@@ -176,14 +178,18 @@ interface Props {
     materials: unknown[] | null;
     services: unknown[] | null;
     sections: Record<string, PageSection[]>;
+    header: ChromeBlock[] | null;
+    footer: ChromeBlock[] | null;
   };
 }
 
 export default function ContentEditor({ initial }: Props) {
   const router = useRouter();
 
-  // Top navigation mode: 'builder' | 'chrome' | 'contacts' | 'media' | 'other'
-  const [mainMode, setMainMode] = useState<'builder' | 'chrome' | 'contacts' | 'media' | 'other'>('builder');
+  // Top navigation mode
+  const [mainMode, setMainMode] = useState<
+    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'media' | 'other'
+  >('builder');
 
   // Page builder states
   const [page, setPage] = useState('home');
@@ -207,6 +213,14 @@ export default function ContentEditor({ initial }: Props) {
   const [pickerTab, setPickerTab] = useState<'all' | 'images' | 'docs'>('all');
   const [pickerMode, setPickerMode] = useState<'insert' | 'background'>('insert');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Flexible header / footer blocks
+  const [headerBlocks, setHeaderBlocks] = useState<ChromeBlock[]>(() =>
+    initial.header?.length ? sanitizeChrome(initial.header, 'header') : defaultChromeBlocks('header')
+  );
+  const [footerBlocks, setFooterBlocks] = useState<ChromeBlock[]>(() =>
+    initial.footer?.length ? sanitizeChrome(initial.footer, 'footer') : defaultChromeBlocks('footer')
+  );
 
   // Legacy & global states
   const [contacts, setContacts] = useState(initial.contacts);
@@ -473,6 +487,46 @@ export default function ContentEditor({ initial }: Props) {
     }
   };
 
+  const saveHeader = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setOk(null); setBusy(true);
+    try {
+      const ok = await saveChromeBlocks('header', headerBlocks);
+      if (!ok) throw new Error('Ошибка сохранения');
+      setOk('Шапка сохранена! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally { setBusy(false); }
+  };
+
+  const saveFooter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setOk(null); setBusy(true);
+    try {
+      const ok = await saveChromeBlocks('footer', footerBlocks);
+      if (!ok) throw new Error('Ошибка сохранения');
+      setOk('Подвал сохранён! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally { setBusy(false); }
+  };
+
+  const saveChromeBlocks = async (
+    area: 'header' | 'footer',
+    blocks: ChromeBlock[]
+  ): Promise<boolean> => {
+    const res = await fetch(`/api/content/${area}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(blocks),
+    });
+    return res.ok;
+  };
+
   // Save contacts
   const saveContacts = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -554,10 +608,22 @@ export default function ContentEditor({ initial }: Props) {
           🏗️ Конструктор страниц
         </button>
         <button
+          className={mainMode === 'header' ? 'on' : ''}
+          onClick={() => { setMainMode('header'); setErr(null); setOk(null); }}
+        >
+          🧭 Шапка
+        </button>
+        <button
+          className={mainMode === 'footer' ? 'on' : ''}
+          onClick={() => { setMainMode('footer'); setErr(null); setOk(null); }}
+        >
+          🦶 Подвал
+        </button>
+        <button
           className={mainMode === 'chrome' ? 'on' : ''}
           onClick={() => { setMainMode('chrome'); setErr(null); setOk(null); }}
         >
-          🧭 Шапка и подвал
+          ⚙️ Настройки шапки и подвала
         </button>
         <button
           className={mainMode === 'contacts' ? 'on' : ''}
@@ -1146,19 +1212,56 @@ export default function ContentEditor({ initial }: Props) {
       )}
 
       {/* ========================================================
-          MODE 3: HEADER & FOOTER SETTINGS
+          MODE 2: HEADER BLOCKS
+          ======================================================== */}
+      {mainMode === 'header' && (
+        <form className="aform" onSubmit={saveHeader}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Блоки шапки сайта</h3>
+          <ChromeEditor
+            area="header"
+            blocks={headerBlocks}
+            onChange={setHeaderBlocks}
+            busy={busy}
+          />
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить шапку'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ========================================================
+          MODE 3: FOOTER BLOCKS
+          ======================================================== */}
+      {mainMode === 'footer' && (
+        <form className="aform" onSubmit={saveFooter}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Блоки подвала сайта</h3>
+          <ChromeEditor
+            area="footer"
+            blocks={footerBlocks}
+            onChange={setFooterBlocks}
+            busy={busy}
+          />
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить подвал'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ========================================================
+          MODE 4: HEADER & FOOTER SETTINGS
           ======================================================== */}
       {mainMode === 'chrome' && (
         <form className="aform" onSubmit={saveChrome}>
           <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>Общие настройки шапки и подвала</h3>
-          <div className="field">
-            <label>Верхняя полоска</label>
-            <input value={site?.topbar_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), topbar_ru: e.target.value }))} />
-          </div>
-          <div className="field">
-            <label>Текст в подвале</label>
-            <input value={site?.footer_ru ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), footer_ru: e.target.value }))} />
-          </div>
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
+            Текст верхней полоски, текст в подвале и кнопки Telegram теперь задаются во вкладках
+            «🧭 Шапка» и «🦶 Подвал» — там же меняется порядок блоков. Здесь остаются только настройки,
+            которые используют сами блоки.
+          </p>
           <div className="field">
             <label>Ссылка на Telegram</label>
             <input value={site?.telegram_url ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), telegram_url: e.target.value }))} />
@@ -1214,7 +1317,7 @@ export default function ContentEditor({ initial }: Props) {
       )}
 
       {/* ========================================================
-          MODE 4: CONTACTS
+          MODE 5: CONTACTS
           ======================================================== */}
       {mainMode === 'contacts' && (
         <form className="aform" onSubmit={saveContacts}>

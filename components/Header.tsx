@@ -1,57 +1,45 @@
 'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useCart } from './CartProvider';
-import type { ContactInfo, SiteSettings } from '@/lib/types';
+import ChromeRenderer from './ChromeRenderer';
+import type { ChromeBlock, ContactInfo, SiteSettings } from '@/lib/types';
 
-const DEFAULT_NAV = [
-  { key: 'home', href: '/', ru: 'Главная' },
-  { key: 'about', href: '/about', ru: 'О нас' },
-  { key: 'catalog', href: '/catalog', ru: 'Каталог' },
-  { key: 'production', href: '/production', ru: 'Производство' },
-  { key: 'services', href: '/services', ru: 'Услуги' },
-  { key: 'materials', href: '/materials', ru: 'Материалы' },
-  { key: 'contacts', href: '/contacts', ru: 'Контакты' },
-];
-
-export default function Header({ site, contacts }: { site: SiteSettings; contacts: ContactInfo }) {
-  const pathname = usePathname();
+export default function Header({
+  site,
+  contacts,
+  blocks,
+}: {
+  site: SiteSettings;
+  contacts: ContactInfo;
+  blocks: ChromeBlock[];
+}) {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+  const pathname = usePathname();
 
-  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+  const topbar = blocks.filter((b) => b.is_active && b.kind === 'topbar');
+  const nav = blocks.filter((b) => b.is_active && b.kind !== 'topbar');
 
   return (
     <>
-      <div className="topbar">
-        <div className="wrap">
-          <span>{site.topbar_ru}</span>
-          <div className="tb-right">
-            <a href={contacts.telegram_url} target="_blank" rel="noreferrer">
-              <span className="dot">✈</span> Telegram-канал
-            </a>
+      {topbar.length > 0 && (
+        <div className="topbar">
+          <div className="wrap chrome-blocks chrome-topbar">
+            <ChromeRenderer blocks={topbar} site={site} contacts={contacts} />
           </div>
         </div>
-      </div>
+      )}
       <header>
         <div className="wrap nav">
-          <Link href="/" className="brand" onClick={() => setOpen(false)} title="Новый сайт">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img-1.png" alt="Новый сайт" className="logo-img" width={1121} height={272} />
-          </Link>
-          <nav className={`menu ${open ? 'open' : ''}`}>
-            {DEFAULT_NAV.map((n) => (
-              <Link key={n.href} href={n.href} className={isActive(n.href) ? 'active' : ''} onClick={() => setOpen(false)}>
-                {site[`nav_${n.key}_ru`] || n.ru}
-              </Link>
-            ))}
-          </nav>
+          <div className={`chrome-blocks chrome-nav ${open ? 'open' : ''}`}>
+            <ChromeRenderer blocks={nav} site={site} contacts={contacts} />
+          </div>
           <div className="nav-right">
-            <Link href="/cart" className={`cartlink ${isActive('/cart') ? 'active' : ''}`} aria-label="Корзина" onClick={() => setOpen(false)}>
+            <a href="/cart" className={`cartlink ${pathname === '/cart' ? 'active' : ''}`} aria-label="Корзина">
               <span aria-hidden>🛒</span>
               {count > 0 && <span className="badge-n">{count}</span>}
-            </Link>
+            </a>
             <button className="burger" onClick={() => setOpen((v) => !v)} aria-label="menu">
               {open ? '✕' : '☰'}
             </button>

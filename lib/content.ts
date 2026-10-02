@@ -2,8 +2,9 @@ import { getContentCached } from './db';
 import seed from './seed-data';
 import { getDefaultSections } from './default-sections';
 import type {
-  AboutIntro, ContactInfo, HomeHero, MaterialItem, PageSection, ServiceItem, SiteSettings,
+  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ServiceItem, SiteSettings,
 } from './types';
+import { sanitizeChrome } from './chrome';
 
 const D = seed.contentDefaults as {
   home_hero: HomeHero;
@@ -42,6 +43,12 @@ export async function getMaterials(): Promise<MaterialItem[]> {
 export async function getServices(): Promise<ServiceItem[]> {
   const d = (await getContentCached('services')) as ServiceItem[] | null;
   return d?.length ? d : D.services;
+}
+
+/** Blocks of the flexible header / footer. */
+export async function getChromeBlocks(area: 'header' | 'footer'): Promise<ChromeBlock[]> {
+  const d = await getContentCached(area);
+  return sanitizeChrome(d, area);
 }
 
 export async function getPageSections(page: string): Promise<PageSection[]> {

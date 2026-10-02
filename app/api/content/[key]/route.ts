@@ -4,6 +4,7 @@ import { parseSessionToken, SESSION_COOKIE } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import seed from '@/lib/seed-data';
 import { getDefaultSections } from '@/lib/default-sections';
+import { defaultChromeBlocks } from '@/lib/chrome';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,8 @@ const ALLOWED = [
   'about_intro',
   'contacts',
   'site',
+  'header',
+  'footer',
   'materials',
   'services',
   'notifications',
@@ -47,6 +50,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ key: st
       }
       if (key.startsWith('sections_')) {
         return NextResponse.json(getDefaultSections(key.replace('sections_', '')));
+      }
+      if (key === 'header' || key === 'footer') {
+        return NextResponse.json(defaultChromeBlocks(key));
       }
       return NextResponse.json(seed.contentDefaults[key as keyof typeof seed.contentDefaults] ?? null);
     }

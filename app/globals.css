@@ -978,3 +978,38 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
   border-color: var(--acc);
   background: rgba(37, 195, 214, 0.04);
 }
+
+/* ---- flexible header / footer blocks ---- */
+.chrome-blocks{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
+.chrome-topbar{justify-content:space-between;height:38px;gap:14px;font-size:13px;color:var(--muted)}
+.chrome-topbar .cb-topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chrome-topbar .cb-topbar b{color:var(--txt);font-weight:600}
+.chrome-nav{flex:1 1 auto;min-width:0;align-items:center;gap:14px}
+.chrome-nav .cb-menu{margin-left:auto}
+.chrome-nav .cb-phone a,.chrome-nav .cb-email a{font-size:14px;color:var(--muted);white-space:nowrap}
+.chrome-nav .cb-phone a:hover,.chrome-nav .cb-email a:hover{color:var(--acc)}
+.chrome-nav .cb-phone .cb-strong{color:var(--txt);font-weight:700}
+.chrome-nav .cb-socials a{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--muted);white-space:nowrap}
+.chrome-nav .cb-socials a:hover{color:var(--acc)}
+.chrome-nav .cb-logo .brand .name .t{font-weight:800;letter-spacing:.5px;font-size:15px;white-space:nowrap;margin-left:10px}
+.chrome-nav .cb-html>*{max-width:100%}
+
+.chrome-foot{align-items:flex-start;gap:28px}
+.chrome-foot .cb-logo .brand-row{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.chrome-foot .cb-logo .logo-img{height:52px;width:auto;max-width:100%;object-fit:contain;aspect-ratio:1121/272;display:block}
+.chrome-foot .cb-logo .name .t{font-weight:800;font-size:17px;letter-spacing:.5px}
+.chrome-foot .cb-logo p{font-size:13.5px;color:var(--muted);max-width:300px;margin-top:12px}
+.chrome-foot h4{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:14px}
+.chrome-foot ul{list-style:none}
+.chrome-foot ul li{margin:8px 0}
+.chrome-foot ul li a{color:var(--muted);font-size:14px}
+.chrome-foot ul li a:hover{color:var(--acc)}
+.chrome-foot ul li a.cb-strong{color:var(--txt);font-weight:600}
+.chrome-copy{justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+@media (max-width: 900px){
+  .chrome-nav .cb-menu{position:absolute;top:70px;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:#0a1120;border-bottom:1px solid var(--line);padding:10px 16px 16px;display:none;margin-left:0}
+  .chrome-nav.open .cb-menu{display:flex}
+  .chrome-nav .cb-menu a{padding:12px 13px;font-size:15px}
+  .chrome-foot{flex-direction:column;gap:22px}
+}

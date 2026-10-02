@@ -133,3 +133,34 @@ export interface UploadedFile {
   url: string;
   created_at: string;
 }
+
+// ---- Flexible header / footer blocks ----
+export type ChromeKind =
+  | 'topbar'
+  | 'logo'
+  | 'menu'
+  | 'phone'
+  | 'email'
+  | 'address'
+  | 'hours'
+  | 'contacts'
+  | 'socials'
+  | 'button'
+  | 'links'
+  | 'copyright'
+  | 'html';
+
+export interface ChromeBlock {
+  id: string;
+  kind: ChromeKind;
+  name: string;
+  is_active: boolean;
+  /** Main text / label of the block (or description under the logo) */
+  text?: string;
+  /** Link address for button / logo / socials */
+  href?: string;
+  /** Arbitrary HTML for kind === 'html' */
+  html_ru?: string;
+  /** Link list for kind === 'links': one per line, "Название | /url" */
+  lines?: string;
+}
