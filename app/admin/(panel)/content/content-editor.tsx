@@ -182,8 +182,8 @@ interface Props {
 export default function ContentEditor({ initial }: Props) {
   const router = useRouter();
 
-  // Top navigation mode: 'builder' | 'media' | 'site' | 'other'
-  const [mainMode, setMainMode] = useState<'builder' | 'media' | 'site' | 'other'>('builder');
+  // Top navigation mode: 'builder' | 'chrome' | 'contacts' | 'media' | 'other'
+  const [mainMode, setMainMode] = useState<'builder' | 'chrome' | 'contacts' | 'media' | 'other'>('builder');
 
   // Page builder states
   const [page, setPage] = useState('home');
@@ -450,26 +450,43 @@ export default function ContentEditor({ initial }: Props) {
     }
   };
 
-  // Save site & contacts
-  const saveSiteAndContacts = async (e: React.FormEvent) => {
+  // Save header & footer settings
+  const saveChrome = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
     setOk(null);
     setBusy(true);
     try {
-      await Promise.all([
-        fetch('/api/content/site', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(site),
-        }),
-        fetch('/api/content/contacts', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(contacts),
-        }),
-      ]);
-      setOk('Настройки шапки, подвала и контактов сохранены!');
+      const res = await fetch('/api/content/site', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(site),
+      });
+      if (!res.ok) throw new Error('Ошибка сохранения');
+      setOk('Шапка и подвал сохранены! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Save contacts
+  const saveContacts = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    setOk(null);
+    setBusy(true);
+    try {
+      const res = await fetch('/api/content/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contacts),
+      });
+      if (!res.ok) throw new Error('Ошибка сохранения');
+      setOk('Контактные данные сохранены! Изменения появятся на сайте в течение ~30 секунд.');
       setTimeout(() => setOk(null), 4000);
       router.refresh();
     } catch (ex) {
@@ -537,16 +554,22 @@ export default function ContentEditor({ initial }: Props) {
           🏗️ Конструктор страниц
         </button>
         <button
+          className={mainMode === 'chrome' ? 'on' : ''}
+          onClick={() => { setMainMode('chrome'); setErr(null); setOk(null); }}
+        >
+          🧭 Шапка и подвал
+        </button>
+        <button
+          className={mainMode === 'contacts' ? 'on' : ''}
+          onClick={() => { setMainMode('contacts'); setErr(null); setOk(null); }}
+        >
+          📞 Контакты
+        </button>
+        <button
           className={mainMode === 'media' ? 'on' : ''}
           onClick={() => { setMainMode('media'); setErr(null); setOk(null); loadFiles(); }}
         >
           📁 Файлы и документы {files.length > 0 && `(${files.length})`}
-        </button>
-        <button
-          className={mainMode === 'site' ? 'on' : ''}
-          onClick={() => { setMainMode('site'); setErr(null); setOk(null); }}
-        >
-          ⚙️ Шапка, подвал и контакты
         </button>
         <button
           className={mainMode === 'other' ? 'on' : ''}
@@ -1123,10 +1146,10 @@ export default function ContentEditor({ initial }: Props) {
       )}
 
       {/* ========================================================
-          MODE 3: SITE SETTINGS & CONTACTS
+          MODE 3: HEADER & FOOTER SETTINGS
           ======================================================== */}
-      {mainMode === 'site' && (
-        <form className="aform" onSubmit={saveSiteAndContacts}>
+      {mainMode === 'chrome' && (
+        <form className="aform" onSubmit={saveChrome}>
           <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>Общие настройки шапки и подвала</h3>
           <div className="field">
             <label>Верхняя полоска</label>
@@ -1182,7 +1205,20 @@ export default function ContentEditor({ initial }: Props) {
             </div>
           </div>
 
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginTop: 28, marginBottom: 16 }}>Контактные данные</h3>
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить шапку и подвал'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ========================================================
+          MODE 4: CONTACTS
+          ======================================================== */}
+      {mainMode === 'contacts' && (
+        <form className="aform" onSubmit={saveContacts}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>Контактные данные</h3>
           <div className="frow">
             <div className="field">
               <label>Телефон для отображения</label>
@@ -1214,7 +1250,7 @@ export default function ContentEditor({ initial }: Props) {
 
           <div className="form-actions" style={{ marginTop: 24 }}>
             <button className="btn primary" disabled={busy}>
-              {busy ? '…' : '💾 Сохранить настройки'}
+              {busy ? '…' : '💾 Сохранить контакты'}
             </button>
           </div>
         </form>
