@@ -5,6 +5,7 @@ import type { ChromeBlock, MaterialItem, PageSection, ServiceItem, UploadedFile 
 import { getDefaultSections } from '@/lib/default-sections';
 import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
 import ChromeEditor from './chrome-editor';
+import RichHtmlEditor from '@/components/editor';
 import { MaterialsEditor, ServicesEditor } from './refs-editor';
 
 const PAGES = [
@@ -987,25 +988,20 @@ export default function ContentEditor({ initial }: Props) {
                         </div>
                       )}
 
-                      {/* HTML Code Editor */}
-                      <div className="field">
-                        <textarea
-                          rows={14}
-                          style={{
-                            fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
-                            fontSize: 13.5,
-                            lineHeight: 1.5,
-                          }}
-                          value={activeSection.html_ru}
-                          onChange={(e) =>
-                            updateActiveSection((s) => ({
-                              ...s,
-                              html_ru: e.target.value,
-                            }))
-                          }
-                          placeholder="Вставьте HTML-разметку или текст..."
-                        />
-                      </div>
+                      {/* Редактор содержимого блока */}
+                      <RichHtmlEditor
+                        label="Содержимое блока"
+                        hint="Пишите как в текстовом редакторе — кнопки сверху. Нужна своя вёрстка? Переключитесь на вкладку «HTML-код»."
+                        placeholder="Вставьте HTML-разметку или текст..."
+                        value={activeSection.html_ru}
+                        onChange={(v) =>
+                          updateActiveSection((s) => ({
+                            ...s,
+                            html_ru: v,
+                          }))
+                        }
+                        minHeight={300}
+                      />
 
                       {/* Live Preview Switcher & Container */}
                       <div style={{ marginTop: 24 }}>

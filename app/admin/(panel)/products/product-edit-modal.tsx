@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import RichHtmlEditor from '@/components/admin/RichHtmlEditor';
+import RichHtmlEditor from '@/components/editor';
 
 export interface ProductFormValues {
   id?: number;

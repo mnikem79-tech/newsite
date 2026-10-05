@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { ChromeArea, ChromeKindDef } from '@/lib/chrome';
 import { kindsForArea, makeBlock, kindDef } from '@/lib/chrome';
 import type { ChromeBlock } from '@/lib/types';
+import RichHtmlEditor from '@/components/editor';
 
 /** Editor for the flexible header / footer: list of blocks, add / edit / reorder / delete. */
 export default function ChromeEditor({
@@ -176,14 +177,14 @@ export default function ChromeEditor({
                   )}
 
                   {def.fields.includes('html_ru') && (
-                    <div className="field">
-                      <label>HTML-код блока</label>
-                      <textarea
-                        rows={8}
-                        value={b.html_ru ?? ''}
-                        onChange={(e) => patch(b.id, { html_ru: e.target.value })}
-                      />
-                    </div>
+                    <RichHtmlEditor
+                      label="Содержимое блока"
+                      hint="Можно набрать текст кнопками сверху или вставить готовый HTML-код на вкладке «HTML-код»."
+                      placeholder="Введите содержимое блока…"
+                      value={b.html_ru ?? ''}
+                      onChange={(v) => patch(b.id, { html_ru: v })}
+                      minHeight={180}
+                    />
                   )}
 
                   {def.fields.length === 0 && (

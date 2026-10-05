@@ -2,12 +2,19 @@
 import { useEffect, useRef, useState } from 'react';
 import type { UploadedFile } from '@/lib/types';
 
-const SIZES = [
-  { v: '2', label: 'A−', title: 'Маленький текст' },
-  { v: '3', label: 'A', title: 'Обычный текст' },
-  { v: '5', label: 'A+', title: 'Крупный текст' },
-  { v: '6', label: 'A++', title: 'Заголовок' },
-];
+/**
+ * Универсальный визуальный редактор содержимого.
+ *
+ * Один компонент на весь проект: товары, блоки страниц, шапка/подвал и всё остальное,
+ * где нужно редактирование HTML с кнопками вместо ручной вёрстки.
+ *
+ * Две вкладки:
+ *   • «Визуально»   — панель кнопок, редактирование как в текстовом редакторе
+ *   • «HTML-код»    — сырая разметка для тех, кто умеет вёрстку
+ *
+ * Значение всегда передаётся как строка HTML — тем же форматом, что хранится в базе,
+ * поэтому компонент можно использовать где угодно без преобразований.
+ */
 
 const COLORS = ['#ffffff', '#22d3ee', '#f59e0b', '#ef4444', '#22c55e', '#a78bfa'];
 
@@ -16,44 +23,57 @@ function isImage(name: string, mime?: string) {
   return (mime && mime.startsWith('image/')) || ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif'].includes(ext);
 }
 
-/**
- * Visual (WYSIWYG) editor for the product popup content.
- * Toolbar works on the current selection; «Код» tab shows raw HTML for advanced editing.
- */
+export type PhotoTextSide = 'left' | 'right';
+
 export default function RichHtmlEditor({
   value,
   onChange,
-  label = 'Подробное описание',
+  label = 'Содержимое',
   hint,
+  placeholder = 'Начните писать…',
+  minHeight = 240,
 }: {
   value: string;
   onChange: (html: string) => void;
   label?: string;
   hint?: string;
+  placeholder?: string;
+  minHeight?: number;
 }) {
   const edRef = useRef<HTMLDivElement>(null);
-  const loaded = useRef(false);
+  // последнее значение, которое мы сами отдали наружу — чтобы не перезаписывать своё же
+  const lastEmitted = useRef<string>(value ?? '');
   const [mode, setMode] = useState<'visual' | 'code'>('visual');
   const [code, setCode] = useState(value ?? '');
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [picker, setPicker] = useState(false);
-  // что сделать после выбора фотографии: просто вставить или собрать блок «фото + текст»
-  const [pending, setPending] = useState<'inline' | 'left' | 'right' | null>(null);
+  // что сделать после выбора фотографии
+  const [pending, setPending] = useState<'inline' | PhotoTextSide | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // load the stored HTML into the editable area once
+  // первичная загрузка
   useEffect(() => {
-    if (loaded.current) return;
     if (edRef.current) edRef.current.innerHTML = value ?? '';
-    loaded.current = true;
+    lastEmitted.current = value ?? '';
     setCode(value ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // внешнее изменение значения (шаблон, сниппет, сброс) — подхватываем, если пользователь не печатает
+  useEffect(() => {
+    const incoming = value ?? '';
+    if (incoming === lastEmitted.current) return;
+    if (document.activeElement === edRef.current) return;
+    if (edRef.current) edRef.current.innerHTML = incoming;
+    lastEmitted.current = incoming;
+    setCode(incoming);
+  }, [value]);
+
   const sync = () => {
     const html = edRef.current?.innerHTML ?? '';
+    lastEmitted.current = html;
     setCode(html);
     onChange(html);
   };
@@ -117,28 +137,27 @@ export default function RichHtmlEditor({
 
   const insertImage = (url: string, alt: string) => {
     const safeAlt = String(alt).replace(/"/g, '');
+
     if (pending === 'left' || pending === 'right') {
-      const cls = pending === 'right' ? 'pt-row pt-row--rev pt-row--center' : 'pt-row pt-row--center';
+      const cls =
+        pending === 'right' ? 'pt-row pt-row--rev pt-row--center' : 'pt-row pt-row--center';
       insertHtml(
         `\n<div class="${cls}">\n` +
           `  <img class="pt-img" src="${url}" alt="${safeAlt}" />\n` +
-          `  <div class="pt-text">\n    <p>Текст справа от фотографии. Напишите здесь описание — на узком экране он сам перейдёт под картинку.</p>\n  </div>\n` +
+          `  <div class="pt-text">\n` +
+          `    <p>Текст рядом с фотографией. Напишите здесь описание — на узком экране оно само перейдёт под картинку.</p>\n` +
+          `  </div>\n` +
           `</div>\n<p></p>\n`
       );
       setPending(null);
       setPicker(false);
       return;
     }
+
     insertHtml(
       `\n<img src="${url}" alt="${safeAlt}" style="max-width:100%;height:auto;border-radius:12px;margin:10px 0" />\n`
     );
     setPicker(false);
-  };
-
-  // открыть выбор фото для готового блока «фото + текст»
-  const pickPhotoText = (side: 'left' | 'right') => {
-    setPending(side);
-    setPicker(true);
   };
 
   const addLink = () => {
@@ -155,7 +174,10 @@ export default function RichHtmlEditor({
     for (let r = 0; r < rows; r += 1) {
       html += '<tr>';
       for (let c = 0; c < cols; c += 1) {
-        html += r === 0 ? '<th style="border:1px solid #2a3a52;padding:8px">Заголовок</th>' : '<td style="border:1px solid #2a3a52;padding:8px">&nbsp;</td>';
+        html +=
+          r === 0
+            ? '<th style="border:1px solid #2a3a52;padding:8px">Заголовок</th>'
+            : '<td style="border:1px solid #2a3a52;padding:8px">&nbsp;</td>';
       }
       html += '</tr>';
     }
@@ -166,8 +188,8 @@ export default function RichHtmlEditor({
   const switchTo = (m: 'visual' | 'code') => {
     if (m === mode) return;
     if (m === 'visual') {
-      // push the hand-edited code into the visual area
       if (edRef.current) edRef.current.innerHTML = code;
+      lastEmitted.current = code;
       onChange(code);
     } else {
       setCode(edRef.current?.innerHTML ?? '');
@@ -179,16 +201,14 @@ export default function RichHtmlEditor({
     title,
     onClick,
     children,
-    active,
   }: {
     title: string;
     onClick: () => void;
     children: React.ReactNode;
-    active?: boolean;
   }) => (
     <button
       type="button"
-      className={`rte-btn${active ? ' on' : ''}`}
+      className="rte-btn"
       title={title}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
@@ -196,6 +216,8 @@ export default function RichHtmlEditor({
       {children}
     </button>
   );
+
+  const images = files.filter((f) => isImage(f.original_name, f.mime_type));
 
   return (
     <div className="field">
@@ -232,18 +254,17 @@ export default function RichHtmlEditor({
             <Btn title="Выровнять по левому краю" onClick={() => exec('justifyLeft')}>⯇</Btn>
             <Btn title="Выровнять по центру" onClick={() => exec('justifyCenter')}>⯈</Btn>
             <Btn title="Выровнять по правому краю" onClick={() => exec('justifyRight')}>⯉</Btn>
-            <Btn title="Выровнять по ширине" onClick={() => exec('justifyFull')}><span style={{ transform: 'scaleX(1.3)', display: 'inline-block' }}>≡</span></Btn>
+            <Btn title="Выровнять по ширине" onClick={() => exec('justifyFull')}>
+              <span style={{ transform: 'scaleX(1.3)', display: 'inline-block' }}>≡</span>
+            </Btn>
             <span className="rte-sep" />
             <Btn title="Маркированный список" onClick={() => exec('insertUnorderedList')}>•—</Btn>
             <Btn title="Нумерованный список" onClick={() => exec('insertOrderedList')}>1.</Btn>
             <Btn title="Цитата" onClick={() => exec('formatBlock', 'blockquote')}>❝</Btn>
             <Btn title="Разделительная линия" onClick={() => insertHtml('<hr />')}>—</Btn>
             <span className="rte-sep" />
-            <Btn title="Цвет текста" onClick={() => exec('foreColor', '#22d3ee')}>
-              <span style={{ color: '#22d3ee' }}>●</span>
-            </Btn>
             {COLORS.map((c) => (
-              <Btn key={c} title={`Цвет: ${c}`} onClick={() => exec('foreColor', c)}>
+              <Btn key={c} title={`Цвет текста ${c}`} onClick={() => exec('foreColor', c)}>
                 <span style={{ color: c }}>●</span>
               </Btn>
             ))}
@@ -259,6 +280,8 @@ export default function RichHtmlEditor({
             <div
               ref={edRef}
               className="rte-area"
+              style={{ minHeight }}
+              data-ph={placeholder}
               contentEditable
               suppressContentEditableWarning
               onInput={sync}
@@ -268,13 +291,13 @@ export default function RichHtmlEditor({
           </div>
 
           <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-            <button type="button" className="mini-btn" onClick={() => setPicker((v) => !v)}>
+            <button type="button" className="mini-btn" onClick={() => { setPending('inline'); setPicker(true); }}>
               🖼 Вставить фото
             </button>
             <button
               type="button"
               className="mini-btn"
-              onClick={() => pickPhotoText('left')}
+              onClick={() => { setPending('left'); setPicker(true); }}
               title="Фотография слева, текст справа. На узком экране текст перейдёт под фото."
             >
               🖼▸ Фото и текст
@@ -282,7 +305,7 @@ export default function RichHtmlEditor({
             <button
               type="button"
               className="mini-btn"
-              onClick={() => pickPhotoText('right')}
+              onClick={() => { setPending('right'); setPicker(true); }}
               title="Текст слева, фотография справа. На узком экране текст перейдёт под фото."
             >
               ◂🖼 Текст и фото
@@ -306,46 +329,47 @@ export default function RichHtmlEditor({
 
           <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8, lineHeight: 1.55 }}>
             <b>Фото и текст</b> / <b>Текст и фото</b> — готовый адаптивный блок: на широком экране текст
-            стоит рядом с фотографией, на узком (телефон) сам переезжает под неё. Размер блока менять не
-            нужно — он подстраивается сам.
+            стоит рядом с фотографией, на узком (телефон) сам переезжает под неё.
           </div>
 
           {picker && (
             <div className="a-card" style={{ marginTop: 12, maxHeight: 280, overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <b style={{ fontSize: 14 }}>
-                  {pending ? 'Выберите фото для блока «фото + текст»' : 'Выберите фото для вставки'}
+                  {pending && pending !== 'inline'
+                    ? 'Выберите фото для блока «фото + текст»'
+                    : 'Выберите фото для вставки'}
                 </b>
-                <button type="button" className="mini-btn red" onClick={() => setPicker(false)}>✕</button>
+                <button type="button" className="mini-btn red" onClick={() => { setPicker(false); setPending(null); }}>
+                  ✕
+                </button>
               </div>
-              {files.filter((f) => isImage(f.original_name, f.mime_type)).length === 0 ? (
+              {images.length === 0 ? (
                 <p style={{ fontSize: 13, color: 'var(--muted)' }}>
                   Фотографий пока нет. Загрузите первую кнопкой «⬆️ Загрузить фото».
                 </p>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(96px,1fr))', gap: 10 }}>
-                  {files
-                    .filter((f) => isImage(f.original_name, f.mime_type))
-                    .map((f) => (
-                      <button
-                        key={f.id}
-                        type="button"
-                        className="mini-btn"
-                        style={{ padding: 4, display: 'block' }}
-                        onClick={() => insertImage(f.url, f.original_name)}
-                        title={`Вставить «${f.original_name}»`}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={f.url}
-                          alt={f.original_name}
-                          style={{ width: '100%', height: 64, objectFit: 'cover', borderRadius: 6 }}
-                        />
-                        <div style={{ fontSize: 10.5, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {f.original_name}
-                        </div>
-                      </button>
-                    ))}
+                  {images.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      className="mini-btn"
+                      style={{ padding: 4, display: 'block' }}
+                      onClick={() => insertImage(f.url, f.original_name)}
+                      title={`Вставить «${f.original_name}»`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.url}
+                        alt={f.original_name}
+                        style={{ width: '100%', height: 64, objectFit: 'cover', borderRadius: 6 }}
+                      />
+                      <div style={{ fontSize: 10.5, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {f.original_name}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -359,8 +383,10 @@ export default function RichHtmlEditor({
             value={code}
             onChange={(e) => {
               setCode(e.target.value);
+              lastEmitted.current = e.target.value;
               onChange(e.target.value);
             }}
+            placeholder="<p>Текст с HTML-разметкой</p>"
           />
           <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 6 }}>
             Разметка HTML. Переключитесь на «✏️ Визуально», чтобы увидеть результат.
