@@ -1069,3 +1069,19 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
 .rte-area table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
 .rte-area th,.rte-area td{border:1px solid #2a3a52;padding:8px 10px;text-align:left}
 .rte-area th{background:rgba(255,255,255,.05);color:var(--txt)}
+
+/* ---- адаптивный блок «фото + текст» (визуальный редактор) ---- */
+.pt-row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;margin:14px 0}
+.pt-row .pt-img{flex:0 0 300px;max-width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.pt-row .pt-text{flex:1 1 240px;min-width:0}
+.pt-row .pt-text p{margin:0 0 10px}
+.pt-row .pt-text p:last-child{margin-bottom:0}
+.pt-row .pt-text ul,.pt-row .pt-text ol{margin:0 0 10px;padding-left:22px}
+.pt-row .pt-text li{margin:5px 0}
+.pt-row--rev{flex-direction:row-reverse}
+.pt-row--center{align-items:center}
+@media (max-width: 620px){
+  .pt-row{gap:14px}
+  .pt-row .pt-img{flex:0 0 100%;width:100%}
+  .pt-row .pt-text{flex:1 1 100%}
+}

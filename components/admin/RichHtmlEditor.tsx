@@ -37,6 +37,8 @@ export default function RichHtmlEditor({
   const [code, setCode] = useState(value ?? '');
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [picker, setPicker] = useState(false);
+  // что сделать после выбора фотографии: просто вставить или собрать блок «фото + текст»
+  const [pending, setPending] = useState<'inline' | 'left' | 'right' | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -114,10 +116,29 @@ export default function RichHtmlEditor({
   };
 
   const insertImage = (url: string, alt: string) => {
+    const safeAlt = String(alt).replace(/"/g, '');
+    if (pending === 'left' || pending === 'right') {
+      const cls = pending === 'right' ? 'pt-row pt-row--rev pt-row--center' : 'pt-row pt-row--center';
+      insertHtml(
+        `\n<div class="${cls}">\n` +
+          `  <img class="pt-img" src="${url}" alt="${safeAlt}" />\n` +
+          `  <div class="pt-text">\n    <p>Текст справа от фотографии. Напишите здесь описание — на узком экране он сам перейдёт под картинку.</p>\n  </div>\n` +
+          `</div>\n<p></p>\n`
+      );
+      setPending(null);
+      setPicker(false);
+      return;
+    }
     insertHtml(
-      `\n<img src="${url}" alt="${String(alt).replace(/"/g, '')}" style="max-width:100%;height:auto;border-radius:12px;margin:10px 0" />\n`
+      `\n<img src="${url}" alt="${safeAlt}" style="max-width:100%;height:auto;border-radius:12px;margin:10px 0" />\n`
     );
     setPicker(false);
+  };
+
+  // открыть выбор фото для готового блока «фото + текст»
+  const pickPhotoText = (side: 'left' | 'right') => {
+    setPending(side);
+    setPicker(true);
   };
 
   const addLink = () => {
@@ -250,6 +271,22 @@ export default function RichHtmlEditor({
             <button type="button" className="mini-btn" onClick={() => setPicker((v) => !v)}>
               🖼 Вставить фото
             </button>
+            <button
+              type="button"
+              className="mini-btn"
+              onClick={() => pickPhotoText('left')}
+              title="Фотография слева, текст справа. На узком экране текст перейдёт под фото."
+            >
+              🖼▸ Фото и текст
+            </button>
+            <button
+              type="button"
+              className="mini-btn"
+              onClick={() => pickPhotoText('right')}
+              title="Текст слева, фотография справа. На узком экране текст перейдёт под фото."
+            >
+              ◂🖼 Текст и фото
+            </button>
             <label className="mini-btn" style={{ cursor: 'pointer' }}>
               {busy ? '⏳ Загрузка…' : '⬆️ Загрузить фото'}
               <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={upload} />
@@ -267,10 +304,18 @@ export default function RichHtmlEditor({
             </button>
           </div>
 
+          <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8, lineHeight: 1.55 }}>
+            <b>Фото и текст</b> / <b>Текст и фото</b> — готовый адаптивный блок: на широком экране текст
+            стоит рядом с фотографией, на узком (телефон) сам переезжает под неё. Размер блока менять не
+            нужно — он подстраивается сам.
+          </div>
+
           {picker && (
             <div className="a-card" style={{ marginTop: 12, maxHeight: 280, overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <b style={{ fontSize: 14 }}>Выберите фото для вставки</b>
+                <b style={{ fontSize: 14 }}>
+                  {pending ? 'Выберите фото для блока «фото + текст»' : 'Выберите фото для вставки'}
+                </b>
                 <button type="button" className="mini-btn red" onClick={() => setPicker(false)}>✕</button>
               </div>
               {files.filter((f) => isImage(f.original_name, f.mime_type)).length === 0 ? (
