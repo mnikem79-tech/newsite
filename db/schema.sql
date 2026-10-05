@@ -82,3 +82,15 @@ CREATE TABLE IF NOT EXISTS uploads (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_uploads_filename ON uploads(filename);
+
+CREATE TABLE IF NOT EXISTS pages (
+  id              SERIAL PRIMARY KEY,
+  slug            TEXT NOT NULL UNIQUE,
+  title_ru        TEXT NOT NULL,
+  is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+  in_menu         BOOLEAN NOT NULL DEFAULT TRUE,
+  position        INTEGER NOT NULL DEFAULT 0,
+  is_system       BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);

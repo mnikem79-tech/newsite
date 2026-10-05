@@ -1,5 +1,6 @@
 import { q } from '@/lib/db';
 import { getDefaultSections } from '@/lib/default-sections';
+import { getPages } from '@/lib/content';
 import ContentEditor from './content-editor';
 import type { ChromeBlock, MaterialItem, PageSection, ServiceItem } from '@/lib/types';
 
@@ -33,6 +34,7 @@ export default async function AdminContent() {
     sec_checkout,
     header_blocks,
     footer_blocks,
+    pages,
   ] = await Promise.all([
     getKey('home_hero'),
     getKey('about_intro'),
@@ -51,6 +53,7 @@ export default async function AdminContent() {
     getKey('sections_checkout'),
     getKey('header'),
     getKey('footer'),
+    getPages(),
   ]);
 
   const prepareSections = (pageKey: string, raw: unknown): PageSection[] => {
@@ -115,6 +118,7 @@ export default async function AdminContent() {
           materials: (materials ?? null) as MaterialItem[] | null,
           services: (services ?? null) as ServiceItem[] | null,
           sections,
+          pages,
           header: header_blocks as ChromeBlock[] | null,
           footer: footer_blocks as ChromeBlock[] | null,
         }}

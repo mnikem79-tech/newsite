@@ -38,6 +38,25 @@ export function invalidateContent(key?: string) {
   else contentCache.clear();
 }
 
+const pagesCache = { at: 0, val: null as unknown };
+export async function getPagesCached(): Promise<unknown> {
+  if (pagesCache.val && Date.now() - pagesCache.at < CONTENT_TTL) return pagesCache.val;
+  try {
+    const res = await q('SELECT id, slug, title_ru, is_active, in_menu, position, is_system FROM pages ORDER BY position, id');
+    pagesCache.at = Date.now();
+    pagesCache.val = res.rows;
+    return res.rows;
+  } catch (err) {
+    console.error('DB error for pages:', err);
+    return null;
+  }
+}
+
+export function invalidatePages() {
+  pagesCache.at = 0;
+  pagesCache.val = null;
+}
+
 let uploadsTableChecked = false;
 export async function ensureUploadsTable() {
   if (uploadsTableChecked) return;

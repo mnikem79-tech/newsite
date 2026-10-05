@@ -491,6 +491,30 @@ export const DEFAULT_PAGE_SECTIONS: Record<string, PageSection[]> = {
 
 export function getDefaultSections(page: string): PageSection[] {
   const list = DEFAULT_PAGE_SECTIONS[page];
-  if (!list) return [];
+  if (!list) {
+    // новая страница, созданная в админке: даём заготовку, чтобы не было пустого экрана
+    return [
+      {
+        id: `${page}-head`,
+        name: 'Заголовок страницы',
+        type: 'html',
+        is_active: true,
+        container: 'full',
+        padding_top: 40,
+        padding_bottom: 30,
+        html_ru: `<div class="pagehead"><div class="wrap"><h1>Новая страница</h1><p>Замените этот текст на свой — откройте блок в конструкторе и нажмите «Изменить».</p></div></div>`,
+      },
+      {
+        id: `${page}-text`,
+        name: 'Текстовый блок',
+        type: 'html',
+        is_active: true,
+        container: 'wrap',
+        padding_top: 20,
+        padding_bottom: 40,
+        html_ru: `<div class="prose"><p>Расскажите здесь о чём эта страница. Используйте визуальный редактор: жирный текст, списки, фотографии, таблицы.</p></div>`,
+      },
+    ];
+  }
   return JSON.parse(JSON.stringify(list));
 }

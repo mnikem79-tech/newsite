@@ -3,16 +3,18 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useCart } from './CartProvider';
 import ChromeRenderer from './ChromeRenderer';
-import type { ChromeBlock, ContactInfo, SiteSettings } from '@/lib/types';
+import type { ChromeBlock, ContactInfo, PageItem, SiteSettings } from '@/lib/types';
 
 export default function Header({
   site,
   contacts,
   blocks,
+  pages,
 }: {
   site: SiteSettings;
   contacts: ContactInfo;
   blocks: ChromeBlock[];
+  pages: PageItem[];
 }) {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
@@ -33,7 +35,7 @@ export default function Header({
       <header>
         <div className="wrap nav">
           <div className={`chrome-blocks chrome-nav ${open ? 'open' : ''}`}>
-            <ChromeRenderer blocks={nav} site={site} contacts={contacts} />
+            <ChromeRenderer blocks={nav} site={site} contacts={contacts} pages={pages} />
           </div>
           <div className="nav-right">
             <a href="/cart" className={`cartlink ${pathname === '/cart' ? 'active' : ''}`} aria-label="Корзина">

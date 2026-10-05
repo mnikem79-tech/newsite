@@ -1,8 +1,8 @@
-import { getContentCached } from './db';
+import { getContentCached, getPagesCached } from './db';
 import seed from './seed-data';
 import { getDefaultSections } from './default-sections';
 import type {
-  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ServiceItem, SiteSettings,
+  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, PageItem, ServiceItem, SiteSettings,
 } from './types';
 import { sanitizeChrome } from './chrome';
 
@@ -43,6 +43,28 @@ export async function getMaterials(): Promise<MaterialItem[]> {
 export async function getServices(): Promise<ServiceItem[]> {
   const d = (await getContentCached('services')) as ServiceItem[] | null;
   return d?.length ? d : D.services;
+}
+
+const FALLBACK_PAGES: PageItem[] = [
+  { id: -1, slug: 'about', title_ru: 'О компании', is_active: true, in_menu: true, position: 1, is_system: false },
+  { id: -2, slug: 'production', title_ru: 'Производство', is_active: true, in_menu: true, position: 2, is_system: false },
+  { id: -3, slug: 'services', title_ru: 'Услуги', is_active: true, in_menu: true, position: 3, is_system: false },
+  { id: -4, slug: 'materials', title_ru: 'Материалы', is_active: true, in_menu: true, position: 4, is_system: false },
+  { id: -5, slug: 'contacts', title_ru: 'Контакты', is_active: true, in_menu: true, position: 5, is_system: false },
+];
+
+/** All pages, active first — for the admin page switcher. */
+export async function getPages(): Promise<PageItem[]> {
+  const d = (await getPagesCached()) as PageItem[] | null;
+  if (Array.isArray(d) && d.length) return d;
+  return FALLBACK_PAGES;
+}
+
+/** Pages shown in the site menu. */
+export async function getMenuPages(): Promise<PageItem[]> {
+  const all = await getPages();
+  const menu = all.filter((p) => p.is_active && p.in_menu);
+  return menu.length ? menu : FALLBACK_PAGES.filter((p) => p.in_menu);
 }
 
 /** Blocks of the flexible header / footer. */

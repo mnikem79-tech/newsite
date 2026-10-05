@@ -1,24 +1,13 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import type { ChromeBlock, MaterialItem, PageSection, ServiceItem, UploadedFile } from '@/lib/types';
+import type { ChromeBlock, MaterialItem, PageItem, PageSection, ServiceItem, UploadedFile } from '@/lib/types';
 import { getDefaultSections } from '@/lib/default-sections';
 import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
 import ChromeEditor from './chrome-editor';
+import PagesManager from './pages-manager';
 import RichHtmlEditor from '@/components/editor';
 import { MaterialsEditor, ServicesEditor } from './refs-editor';
-
-const PAGES = [
-  { id: 'home', title: '🏠 Главная' },
-  { id: 'about', title: '🏢 О компании' },
-  { id: 'catalog', title: '📦 Каталог' },
-  { id: 'production', title: '🏭 Производство' },
-  { id: 'services', title: '⚙️ Услуги' },
-  { id: 'materials', title: '📄 Материалы' },
-  { id: 'contacts', title: '📞 Контакты' },
-  { id: 'cart', title: '🛒 Корзина' },
-  { id: 'checkout', title: '💳 Оформление' },
-];
 
 export function getFileMeta(name: string, mime?: string) {
   const ext = (name.split('.').pop() || '').toLowerCase();
@@ -180,6 +169,7 @@ interface Props {
     sections: Record<string, PageSection[]>;
     header: ChromeBlock[] | null;
     footer: ChromeBlock[] | null;
+    pages: PageItem[];
     materials: MaterialItem[] | null;
     services: ServiceItem[] | null;
   };
@@ -217,6 +207,10 @@ export default function ContentEditor({ initial }: Props) {
   const [pickerTab, setPickerTab] = useState<'all' | 'images' | 'docs'>('all');
   const [pickerMode, setPickerMode] = useState<'insert' | 'background'>('insert');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Pages of the site (managed from the admin panel)
+  const [pages, setPages] = useState<PageItem[]>(initial.pages);
+  const [showPages, setShowPages] = useState(false);
 
   // Flexible header / footer blocks
   const [headerBlocks, setHeaderBlocks] = useState<ChromeBlock[]>(() =>
@@ -679,20 +673,30 @@ export default function ContentEditor({ initial }: Props) {
           {/* Select Page */}
           <div className="builder-page-select">
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--muted2)', marginRight: 6 }}>Страница:</span>
-            {PAGES.map((p) => (
+            {pages.map((p) => (
               <button
                 key={p.id}
-                className={`builder-page-btn ${page === p.id ? 'active' : ''}`}
+                className={`builder-page-btn ${page === p.slug ? 'active' : ''}${p.is_active ? '' : ' off'}`}
+                title={p.is_active ? p.title_ru : `${p.title_ru} (скрыта)`}
                 onClick={() => {
-                  setPage(p.id);
-                  setActiveSecId(sectionsByPage[p.id]?.[0]?.id || null);
+                  setPage(p.slug);
+                  setActiveSecId(sectionsByPage[p.slug]?.[0]?.id || null);
                   setErr(null);
                   setOk(null);
                 }}
               >
-                {p.title}
+                {p.title_ru}
               </button>
             ))}
+            <button
+              type="button"
+              className="mini-btn"
+              style={{ marginLeft: 8 }}
+              onClick={() => setShowPages(true)}
+              title="Добавить, переименовать, скрыть или удалить страницы"
+            >
+              ⚙️ Страницы
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20, alignItems: 'start' }}>
@@ -1607,6 +1611,14 @@ export default function ContentEditor({ initial }: Props) {
             )}
           </div>
         </div>
+      )}
+      {/* Управление страницами сайта */}
+      {showPages && (
+        <PagesManager
+          pages={pages}
+          onClose={() => setShowPages(false)}
+          onChanged={() => setPages(initial.pages)}
+        />
       )}
     </div>
   );

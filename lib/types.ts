@@ -135,6 +135,16 @@ export interface UploadedFile {
   created_at: string;
 }
 
+export interface PageItem {
+  id: number;
+  slug: string;
+  title_ru: string;
+  is_active: boolean;
+  in_menu: boolean;
+  position: number;
+  is_system: boolean;
+}
+
 // ---- Flexible header / footer blocks ----
 export type ChromeKind =
   | 'topbar'

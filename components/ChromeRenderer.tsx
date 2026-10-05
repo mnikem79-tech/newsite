@@ -1,18 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ChromeBlock, ContactInfo, SiteSettings } from '@/lib/types';
+import type { ChromeBlock, ContactInfo, PageItem, SiteSettings } from '@/lib/types';
 import { kindDef } from '@/lib/chrome';
-
-const DEFAULT_NAV = [
-  { key: 'home', href: '/', ru: 'Главная' },
-  { key: 'about', href: '/about', ru: 'О нас' },
-  { key: 'catalog', href: '/catalog', ru: 'Каталог' },
-  { key: 'production', href: '/production', ru: 'Производство' },
-  { key: 'services', href: '/services', ru: 'Услуги' },
-  { key: 'materials', href: '/materials', ru: 'Материалы' },
-  { key: 'contacts', href: '/contacts', ru: 'Контакты' },
-];
 
 function parseLines(lines?: string): { text: string; href: string }[] {
   if (!lines) return [];
@@ -31,11 +21,20 @@ export default function ChromeRenderer({
   blocks,
   site,
   contacts,
+  pages = [],
 }: {
   blocks: ChromeBlock[];
   site: SiteSettings;
   contacts: ContactInfo;
+  pages?: PageItem[];
 }) {
+  // меню строится из страниц, которые есть в базе и включены в меню
+  const menuItems = pages
+    .filter((p) => p.is_active && p.in_menu && p.slug !== 'home')
+    .map((p) => ({
+      href: p.slug === 'home' ? '/' : `/${p.slug}`,
+      label: site[`nav_${p.slug}_ru`] || p.title_ru,
+    }));
   const pathname = usePathname();
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
@@ -76,9 +75,9 @@ export default function ChromeRenderer({
             return (
               <div className={cls} key={b.id}>
                 <nav className="menu">
-                  {DEFAULT_NAV.map((n) => (
+                  {menuItems.map((n) => (
                     <Link key={n.href} href={n.href} className={isActive(n.href) ? 'active' : ''}>
-                      {site[`nav_${n.key}_ru`] || n.ru}
+                      {n.label}
                     </Link>
                   ))}
                 </nav>
