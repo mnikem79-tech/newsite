@@ -35,15 +35,16 @@ function hasJunk(s) {
 /** returns [cleaned, removedCount] */
 function cleanString(s) {
   let removed = 0;
-  const out = s.replace(MD_LINK, (_m) => {
+  const out = s.replace(MD_LINK, () => {
     removed += 1;
-    return '';
+    return ' ';
   });
   // leftovers of decorations with nothing meaningful inside
   const tidied = out
     .replace(/\s*\*\*\s*/g, ' ')
     .replace(/\s*\+\+\s*/g, ' ')
     .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\s+([.,;:!?])/g, '$1')
     .replace(/^\s+|\s+$/g, '');
   return [tidied, removed];
 }
