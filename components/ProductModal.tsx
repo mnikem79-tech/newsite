@@ -1,16 +1,14 @@
 'use client';
 import { useEffect } from 'react';
 import ProductDetail from './ProductDetail';
-import type { Product, ProductExtra } from '@/lib/types';
+import type { Product } from '@/lib/types';
 
 /** Popup with the full product description, opened by the «Подробнее» button. */
 export default function ProductModal({
   product,
-  extra,
   onClose,
 }: {
   product: Product;
-  extra: ProductExtra;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -56,7 +54,7 @@ export default function ProductModal({
           </button>
         </div>
         <div className="pmodal-body">
-          <ProductDetail product={product} extra={extra} compact />
+          <ProductDetail product={product} compact />
         </div>
       </div>
     </div>

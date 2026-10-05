@@ -16,8 +16,6 @@ async function readFields(b: any) {
     code: String(b?.code ?? '').trim(),
     category_id: Number(b?.category_id),
     description_ru: String(b?.description_ru ?? ''),
-    supply_ru: b?.supply_ru ? String(b.supply_ru) : null,
-    features_ru: b?.features_ru ? JSON.stringify(b.features_ru) : null,
     detail_html: b?.detail_html ? String(b.detail_html) : null,
     price: b?.price != null && b?.price !== '' && Number.isFinite(Number(b.price)) ? Number(b.price) : null,
     price_note: b?.price_note ? String(b.price_note).slice(0, 200) : null,
@@ -41,10 +39,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!f.name_ru) return NextResponse.json({ error: 'name required' }, { status: 400 });
   if (!Number.isInteger(f.category_id)) return NextResponse.json({ error: 'category required' }, { status: 400 });
   const r = await q(
-    `UPDATE products SET name_ru=$2, code=$3, category_id=$4, description_ru=$5, supply_ru=$6, features_ru=$7, detail_html=$8,
-     price=$9, price_note=$10, is_active=$11, icon=$12, updated_at=now()
+    `UPDATE products SET name_ru=$2, code=$3, category_id=$4, description_ru=$5, detail_html=$6,
+     price=$7, price_note=$8, is_active=$9, icon=$10, updated_at=now()
      WHERE id=$1 RETURNING id`,
-    [id, f.name_ru, f.code, f.category_id, f.description_ru, f.supply_ru, f.features_ru, f.detail_html, f.price, f.price_note, f.is_active, f.icon]
+    [id, f.name_ru, f.code, f.category_id, f.description_ru, f.detail_html, f.price, f.price_note, f.is_active, f.icon]
   );
   if (!r.rows.length) return NextResponse.json({ error: 'not found' }, { status: 404 });
   return NextResponse.json(r.rows[0]);

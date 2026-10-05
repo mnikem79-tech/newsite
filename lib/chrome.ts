@@ -1,15 +1,4 @@
-import type { ChromeBlock, ChromeKind, ProductExtra } from './types';
-
-/** Shared defaults for the product page texts (used when nothing is stored in the DB). */
-export const DEFAULT_PRODUCT_EXTRA: ProductExtra = {
-  supply_ru:
-    'Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии.',
-  features_ru: [
-    'Работа по ГОСТ и ТР, полная документация',
-    'Возможна разработка по требованиям заказчика',
-    'Инженерное сопровождение: расчёты, пусконаладка',
-  ],
-};
+import type { ChromeBlock, ChromeKind } from './types';
 
 export type ChromeArea = 'header' | 'footer';
 

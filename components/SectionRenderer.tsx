@@ -8,9 +8,8 @@ import CartView from '@/components/CartView';
 import CheckoutForm from '@/components/CheckoutForm';
 import { PUBS, PATS } from '@/lib/site-static-data';
 import type {
-  Category, ContactInfo, HomeHero, MaterialItem, PageSection, Product, ProductExtra, ServiceItem,
+  Category, ContactInfo, HomeHero, MaterialItem, PageSection, Product, ServiceItem,
 } from '@/lib/types';
-import { DEFAULT_PRODUCT_EXTRA } from '@/lib/chrome';
 
 interface Props {
   sections: PageSection[];
@@ -22,7 +21,6 @@ interface Props {
   catalogCategories?: Category[];
   catalogProducts?: Product[];
   initialCat?: string;
-  productExtra?: ProductExtra;
 }
 
 export function SectionRenderer({
@@ -35,7 +33,6 @@ export function SectionRenderer({
   catalogCategories = [],
   catalogProducts = [],
   initialCat = 'all',
-  productExtra = DEFAULT_PRODUCT_EXTRA,
 }: Props) {
   return (
     <>
@@ -340,7 +337,6 @@ export function SectionRenderer({
                   categories={catalogCategories}
                   products={catalogProducts}
                   initialCat={initialCat}
-                  productExtra={productExtra}
                 />
               </div>
             </section>

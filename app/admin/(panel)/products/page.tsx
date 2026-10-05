@@ -1,12 +1,10 @@
 import { q } from '@/lib/db';
-import { getProductExtra } from '@/lib/content';
-import type { ProductExtra } from '@/lib/types';
 import ProductsView, { ProductItem, CategoryItem } from './products-view';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminProducts() {
-  const [pr, cr, productExtra] = await Promise.all([
+  const [pr, cr] = await Promise.all([
     q(
       `SELECT p.*, c.name_ru AS cat_ru, c.code AS cat_code
        FROM products p JOIN categories c ON c.id = p.category_id
@@ -19,7 +17,6 @@ export default async function AdminProducts() {
        GROUP BY c.id
        ORDER BY c.position, c.id`
     ),
-    getProductExtra(),
   ]);
 
   return (
@@ -36,7 +33,6 @@ export default async function AdminProducts() {
       <ProductsView
         products={pr.rows as unknown as ProductItem[]}
         categories={cr.rows as unknown as CategoryItem[]}
-        productExtra={productExtra as ProductExtra}
       />
     </>
   );

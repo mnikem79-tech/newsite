@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import type { MaterialItem, ProductExtra, ServiceItem } from '@/lib/types';
+import type { MaterialItem, ServiceItem } from '@/lib/types';
 
 /* ---------- общий маленький список с полями ---------- */
 
@@ -196,56 +196,6 @@ export function ServicesEditor({
       <button type="button" className="mini-btn" style={{ marginTop: 12 }} disabled={busy} onClick={add}>
         + Добавить услугу
       </button>
-    </div>
-  );
-}
-
-/* ---------- общий текст на странице товара ---------- */
-
-export function ProductExtraEditor({
-  value,
-  onChange,
-}: {
-  value: ProductExtra;
-  onChange: (next: ProductExtra) => void;
-}) {
-  return (
-    <div className="aform">
-      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
-        Этот текст и галочки показываются на странице каждого товара. Если у конкретного товара
-        заполнены свои поля «Поставка и гарантии» и «Галочки» — они будут использованы вместо общих.
-      </p>
-      <div className="field">
-        <label>Текст про поставку</label>
-        <textarea
-          rows={3}
-          value={value.supply_ru}
-          onChange={(e) => onChange({ ...value, supply_ru: e.target.value })}
-        />
-        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
-          Оставьте пустым — блок «Поставка» не будет показан
-        </div>
-      </div>
-      <div className="field">
-        <label>Галочки под описанием</label>
-        <textarea
-          rows={5}
-          value={(value.features_ru ?? []).join('\n')}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              features_ru: e.target.value
-                .split('\n')
-                .map((x) => x.trim())
-                .filter(Boolean),
-            })
-          }
-          placeholder={'Каждая галочка с новой строки'}
-        />
-        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
-          Каждая с новой строки. Пусто — галочек не будет
-        </div>
-      </div>
     </div>
   );
 }

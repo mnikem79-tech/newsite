@@ -15,8 +15,6 @@ export interface Product {
   code: string;
   name_ru: string;
   description_ru: string;
-  supply_ru: string | null;
-  features_ru: string[] | null;
   detail_html: string | null;
   price: number | null;
   price_note: string | null;
@@ -152,11 +150,6 @@ export type ChromeKind =
   | 'links'
   | 'copyright'
   | 'html';
-
-export interface ProductExtra {
-  supply_ru: string;
-  features_ru: string[];
-}
 
 export interface ChromeBlock {
   id: string;

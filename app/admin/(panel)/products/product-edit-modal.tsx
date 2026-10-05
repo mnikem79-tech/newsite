@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import HtmlBlockEditor from '@/components/admin/HtmlBlockEditor';
+import RichHtmlEditor from '@/components/admin/RichHtmlEditor';
 
 export interface ProductFormValues {
   id?: number;
@@ -8,8 +8,6 @@ export interface ProductFormValues {
   category_id: number;
   name_ru: string;
   description_ru: string;
-  supply_ru: string | null;
-  features_ru: string[] | null;
   detail_html: string | null;
   price: number | string | null;
   price_note: string | null;
@@ -34,8 +32,6 @@ export default function ProductEditModal({
     category_id: categories[0]?.id ?? 0,
     name_ru: '',
     description_ru: '',
-    supply_ru: null,
-    features_ru: null,
     detail_html: null,
     price: null,
     price_note: null,
@@ -49,8 +45,6 @@ export default function ProductEditModal({
     code: base.code ?? '',
     name_ru: base.name_ru ?? '',
     description_ru: base.description_ru ?? '',
-    supply_ru: base.supply_ru ?? '',
-    features_ru: Array.isArray(base.features_ru) ? base.features_ru.join('\n') : '',
     detail_html: base.detail_html ?? '',
     price: base.price != null ? String(base.price) : '',
     price_note: base.price_note ?? '',
@@ -73,12 +67,7 @@ export default function ProductEditModal({
         ...f,
         category_id: Number(f.category_id),
         price: f.price === '' ? null : Number(f.price),
-        supply_ru: f.supply_ru.trim() || null,
         detail_html: f.detail_html.trim() || null,
-        features_ru: f.features_ru
-          .split('\n')
-          .map((x) => x.trim())
-          .filter(Boolean),
       };
       const res = await fetch(initial?.id ? `/api/products/${initial.id}` : '/api/products', {
         method: initial?.id ? 'PUT' : 'POST',
@@ -163,34 +152,11 @@ export default function ProductEditModal({
             </div>
           </div>
 
-          <div className="field">
-            <label>Поставка и гарантии</label>
-            <textarea
-              rows={3}
-              value={f.supply_ru}
-              onChange={set('supply_ru')}
-              placeholder="Оставьте пустым — будет взят общий текст из вкладки «⚙️ Настройки товаров»"
-            />
-            <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
-              Пусто = общий текст для всех товаров
-            </div>
-            <label style={{ marginTop: 14 }}>Галочки под описанием</label>
-            <textarea
-              rows={4}
-              value={f.features_ru}
-              onChange={set('features_ru')}
-              placeholder={'Одна галочка с новой строки, например: Работа по ГОСТ и ТР'}
-            />
-            <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
-              Каждая с новой строки. Пусто = общий список
-            </div>
-          </div>
-
           <div style={{ height: 1, background: 'var(--line)', margin: '22px 0' }} />
 
-          <HtmlBlockEditor
+          <RichHtmlEditor
             label="Подробное описание (попап «Подробнее»)"
-            hint="Это содержимое всплывающего окна, которое открывается по кнопке «Подробнее» в каталоге. Можно вставлять текст, списки, таблицы и фотографии."
+            hint="Это содержимое всплывающего окна, которое открывается по кнопке «Подробнее» в каталоге. Пишите как в текстовом редакторе: выделите текст и нажимайте кнопки сверху. Фотографии вставляются кнопками ниже."
             value={f.detail_html}
             onChange={(v) => setF((p) => ({ ...p, detail_html: v }))}
           />

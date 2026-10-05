@@ -2,9 +2,9 @@ import { getContentCached } from './db';
 import seed from './seed-data';
 import { getDefaultSections } from './default-sections';
 import type {
-  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ProductExtra, ServiceItem, SiteSettings,
+  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ServiceItem, SiteSettings,
 } from './types';
-import { DEFAULT_PRODUCT_EXTRA, sanitizeChrome } from './chrome';
+import { sanitizeChrome } from './chrome';
 
 const D = seed.contentDefaults as {
   home_hero: HomeHero;
@@ -43,16 +43,6 @@ export async function getMaterials(): Promise<MaterialItem[]> {
 export async function getServices(): Promise<ServiceItem[]> {
   const d = (await getContentCached('services')) as ServiceItem[] | null;
   return d?.length ? d : D.services;
-}
-
-/** Shared "supply" text and feature checkmarks for product pages. */
-export async function getProductExtra(): Promise<ProductExtra> {
-  const d = (await getContentCached('product_extra')) as Partial<ProductExtra> | null;
-  const feats = Array.isArray(d?.features_ru) ? d!.features_ru.filter((x) => typeof x === 'string') : [];
-  return {
-    supply_ru: typeof d?.supply_ru === 'string' ? d!.supply_ru : DEFAULT_PRODUCT_EXTRA.supply_ru,
-    features_ru: feats.length ? feats : DEFAULT_PRODUCT_EXTRA.features_ru,
-  };
 }
 
 /** Blocks of the flexible header / footer. */

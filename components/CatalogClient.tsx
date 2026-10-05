@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import type { Category, Product, ProductExtra } from '@/lib/types';
+import type { Category, Product } from '@/lib/types';
 import ProductModal from './ProductModal';
 
 export function formatPrice(n: number) {
@@ -11,12 +11,10 @@ export default function CatalogClient({
   categories,
   products,
   initialCat,
-  productExtra,
 }: {
   categories: Category[];
   products: Product[];
   initialCat: string;
-  productExtra: ProductExtra;
 }) {
   const [cat, setCat] = useState(initialCat);
   const [openProduct, setOpenProduct] = useState<Product | null>(null);
@@ -73,11 +71,7 @@ export default function CatalogClient({
       ))}
 
       {openProduct && (
-        <ProductModal
-          product={openProduct}
-          extra={productExtra}
-          onClose={() => setOpenProduct(null)}
-        />
+        <ProductModal product={openProduct} onClose={() => setOpenProduct(null)} />
       )}
     </>
   );

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { q } from '@/lib/db';
-import { getProductExtra } from '@/lib/content';
 import ProductDetail from '@/components/ProductDetail';
 import type { Product } from '@/lib/types';
 
@@ -23,8 +22,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
   if (!product) notFound();
 
-  const extra = await getProductExtra();
-
   return (
     <>
       <div className="pagehead" style={{ paddingBottom: 20 }}>
@@ -37,7 +34,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </div>
       <section style={{ paddingTop: 26, paddingBottom: 40 }}>
         <div className="wrap">
-          <ProductDetail product={product} extra={extra} />
+          <ProductDetail product={product} />
         </div>
       </section>
     </>
