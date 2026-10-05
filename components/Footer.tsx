@@ -23,7 +23,6 @@ export default function Footer({
         </div>
         <div className="fcopy chrome-blocks chrome-copy">
           <ChromeRenderer blocks={copy} site={site} contacts={contacts} />
-          <span style={{ opacity: 0.55, fontSize: 12 }}>обновление от 25.09.2026</span>
           <span>
             <Link href="/admin">Админ-панель</Link>
           </span>

@@ -9,6 +9,8 @@ export interface ProductInitial {
   category_id: number;
   name_ru: string;
   description_ru: string;
+  supply_ru: string | null;
+  features_ru: string[] | null;
   price: number | string | null;
   price_note: string | null;
   is_active: boolean;
@@ -28,6 +30,8 @@ export default function ProductForm({
     category_id: initial?.category_id ?? categories[0]?.id ?? 0,
     name_ru: initial?.name_ru ?? '',
     description_ru: initial?.description_ru ?? '',
+    supply_ru: initial?.supply_ru ?? '',
+    features_ru: Array.isArray(initial?.features_ru) ? initial.features_ru.join('\n') : '',
     price: initial?.price != null ? String(initial.price) : '',
     price_note: initial?.price_note ?? '',
     is_active: initial?.is_active ?? true,
@@ -49,6 +53,11 @@ export default function ProductForm({
         ...f,
         category_id: Number(f.category_id),
         price: f.price === '' ? null : Number(f.price),
+        supply_ru: f.supply_ru.trim() || null,
+        features_ru: f.features_ru
+          .split('\n')
+          .map((x) => x.trim())
+          .filter(Boolean),
       };
       const res = await fetch(initial ? `/api/products/${initial.id}` : '/api/products', {
         method: initial ? 'PUT' : 'POST',
@@ -91,7 +100,27 @@ export default function ProductForm({
         <input value={f.name_ru} onChange={set('name_ru')} />
       </div>
       <div className="field">
-        <label>Описание</label>
+        <label>Поставка и гарантии</label>
+        <textarea
+          rows={3}
+          value={f.supply_ru}
+          onChange={set('supply_ru')}
+          placeholder="Оставьте пустым — будет взят общий текст из раздела «Контент → Товары»"
+        />
+        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
+          Пусто = общий текст для всех товаров
+        </div>
+        <label style={{ marginTop: 14 }}>Галочки под описанием</label>
+        <textarea
+          rows={4}
+          value={f.features_ru}
+          onChange={set('features_ru')}
+          placeholder={'Одна галочка с новой строки, например: Работа по ГОСТ и ТР'}
+        />
+        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
+          Каждая с новой строки. Пусто = общий список
+        </div>
+        <label style={{ marginTop: 14 }}>Описание</label>
         <textarea rows={4} value={f.description_ru} onChange={set('description_ru')} />
       </div>
       <div className="frow">

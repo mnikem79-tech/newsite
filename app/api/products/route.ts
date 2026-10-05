@@ -40,13 +40,15 @@ export async function POST(req: Request) {
   let slug = `${slugBase}-${code.replace(/[./\s]+/g, '-')}`.replace(/^-+|-+$/g, '').slice(0, 70);
 
   const res = await q(
-    `INSERT INTO products (slug, category_id, code, name_ru, description_ru, price, price_note, is_active, icon, position)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, (SELECT COALESCE(MAX(position),0)+1 FROM products))
+    `INSERT INTO products (slug, category_id, code, name_ru, description_ru, supply_ru, features_ru, price, price_note, is_active, icon, position)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, (SELECT COALESCE(MAX(position),0)+1 FROM products))
      RETURNING id, slug`,
     [
       slug, category_id, code,
       name_ru,
       String(b?.description_ru ?? ''),
+      b?.supply_ru ? String(b.supply_ru) : null,
+      b?.features_ru ? JSON.stringify(b.features_ru) : null,
       b?.price != null && b?.price !== '' ? Number(b.price) : null,
       b?.price_note ? String(b.price_note).slice(0, 200) : null,
       b?.is_active !== false,

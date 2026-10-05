@@ -2,7 +2,7 @@ import { getContentCached } from './db';
 import seed from './seed-data';
 import { getDefaultSections } from './default-sections';
 import type {
-  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ServiceItem, SiteSettings,
+  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ProductExtra, ServiceItem, SiteSettings,
 } from './types';
 import { sanitizeChrome } from './chrome';
 
@@ -43,6 +43,26 @@ export async function getMaterials(): Promise<MaterialItem[]> {
 export async function getServices(): Promise<ServiceItem[]> {
   const d = (await getContentCached('services')) as ServiceItem[] | null;
   return d?.length ? d : D.services;
+}
+
+const DEFAULT_PRODUCT_EXTRA: ProductExtra = {
+  supply_ru:
+    'Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии.',
+  features_ru: [
+    'Работа по ГОСТ и ТР, полная документация',
+    'Возможна разработка по требованиям заказчика',
+    'Инженерное сопровождение: расчёты, пусконаладка',
+  ],
+};
+
+/** Shared "supply" text and feature checkmarks for product pages. */
+export async function getProductExtra(): Promise<ProductExtra> {
+  const d = (await getContentCached('product_extra')) as Partial<ProductExtra> | null;
+  const feats = Array.isArray(d?.features_ru) ? d!.features_ru.filter((x) => typeof x === 'string') : [];
+  return {
+    supply_ru: typeof d?.supply_ru === 'string' ? d!.supply_ru : DEFAULT_PRODUCT_EXTRA.supply_ru,
+    features_ru: feats.length ? feats : DEFAULT_PRODUCT_EXTRA.features_ru,
+  };
 }
 
 /** Blocks of the flexible header / footer. */

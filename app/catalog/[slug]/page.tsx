@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { q } from '@/lib/db';
+import { getProductExtra } from '@/lib/content';
 import BuyBox from '@/components/BuyBox';
 import type { Product } from '@/lib/types';
 
@@ -23,6 +24,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound();
 
   const p = product as Product;
+  const extra = await getProductExtra();
+  const supply = p.supply_ru?.trim() ? p.supply_ru : extra.supply_ru;
+  const features =
+    Array.isArray(p.features_ru) && p.features_ru.filter((x) => x && x.trim()).length
+      ? p.features_ru.filter((x) => x && x.trim())
+      : extra.features_ru;
   return (
     <>
       <div className="pagehead" style={{ paddingBottom: 20 }}>
@@ -48,15 +55,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
               <div className="desc">{p.description_ru}</div>
-              <div className="notes" style={{ marginTop: 22 }}>
-                <b>Поставка</b>{' '}
-                Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии.
-              </div>
-              <div className="feat-list" style={{ marginTop: 22 }}>
-                <div className="feat"><div className="chk">✓</div><p>Работа по ГОСТ и ТР, полная документация</p></div>
-                <div className="feat"><div className="chk">✓</div><p>Возможна разработка по требованиям заказчика</p></div>
-                <div className="feat"><div className="chk">✓</div><p>Инженерное сопровождение: расчёты, пусконаладка</p></div>
-              </div>
+              {supply?.trim() && (
+                <div className="notes" style={{ marginTop: 22 }}>
+                  <b>Поставка</b>{' '}
+                  {supply}
+                </div>
+              )}
+              {features.length > 0 && (
+                <div className="feat-list" style={{ marginTop: 22 }}>
+                  {features.map((t, i) => (
+                    <div className="feat" key={i}><div className="chk">✓</div><p>{t}</p></div>
+                  ))}
+                </div>
+              )}
             </div>
             <BuyBox
               product={{

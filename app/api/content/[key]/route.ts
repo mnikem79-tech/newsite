@@ -15,6 +15,7 @@ const ALLOWED = [
   'site',
   'header',
   'footer',
+  'product_extra',
   'materials',
   'services',
   'notifications',

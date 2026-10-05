@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS products (
   code            TEXT NOT NULL,
   name_ru         TEXT NOT NULL,
   description_ru  TEXT NOT NULL DEFAULT '',
+  supply_ru       TEXT,
+  features_ru     JSONB,
   price           NUMERIC(12,2),
   price_note      TEXT,
   is_active       BOOLEAN NOT NULL DEFAULT TRUE,

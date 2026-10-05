@@ -1,10 +1,11 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import type { ChromeBlock, PageSection, UploadedFile } from '@/lib/types';
+import type { ChromeBlock, MaterialItem, PageSection, ProductExtra, ServiceItem, UploadedFile } from '@/lib/types';
 import { getDefaultSections } from '@/lib/default-sections';
 import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
 import ChromeEditor from './chrome-editor';
+import { MaterialsEditor, ServicesEditor, ProductExtraEditor } from './refs-editor';
 
 const PAGES = [
   { id: 'home', title: '🏠 Главная' },
@@ -175,11 +176,12 @@ interface Props {
     about_intro: Record<string, string> | null;
     contacts: Record<string, string> | null;
     site: Record<string, string> | null;
-    materials: unknown[] | null;
-    services: unknown[] | null;
     sections: Record<string, PageSection[]>;
     header: ChromeBlock[] | null;
     footer: ChromeBlock[] | null;
+    product_extra: ProductExtra | null;
+    materials: MaterialItem[] | null;
+    services: ServiceItem[] | null;
   };
 }
 
@@ -188,8 +190,10 @@ export default function ContentEditor({ initial }: Props) {
 
   // Top navigation mode
   const [mainMode, setMainMode] = useState<
-    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'media' | 'other'
+    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'products' | 'refs' | 'media'
   >('builder');
+  // sub-tab inside «Справочники»
+  const [refsTab, setRefsTab] = useState<'materials' | 'services'>('materials');
 
   // Page builder states
   const [page, setPage] = useState('home');
@@ -222,11 +226,26 @@ export default function ContentEditor({ initial }: Props) {
     initial.footer?.length ? sanitizeChrome(initial.footer, 'footer') : defaultChromeBlocks('footer')
   );
 
+  // Shared text on product pages
+  const [productExtra, setProductExtra] = useState<ProductExtra>(
+    () =>
+      initial.product_extra ?? {
+        supply_ru: '',
+        features_ru: [],
+      }
+  );
+
+  // Reference lists (materials & services)
+  const [materials, setMaterials] = useState<MaterialItem[]>(() =>
+    Array.isArray(initial.materials) ? initial.materials : []
+  );
+  const [services, setServices] = useState<ServiceItem[]>(() =>
+    Array.isArray(initial.services) ? initial.services : []
+  );
+
   // Legacy & global states
   const [contacts, setContacts] = useState(initial.contacts);
   const [site, setSite] = useState(initial.site);
-  const [materialsJson, setMaterialsJson] = useState(JSON.stringify(initial.materials, null, 2));
-  const [servicesJson, setServicesJson] = useState(JSON.stringify(initial.services, null, 2));
 
   // Status
   const [err, setErr] = useState<string | null>(null);
@@ -550,28 +569,55 @@ export default function ContentEditor({ initial }: Props) {
     }
   };
 
-  // Save JSON
-  const saveJson = async (targetTab: 'materials' | 'services') => {
-    setErr(null);
-    setOk(null);
-    setBusy(true);
+  const putContent = async (key: string, data: unknown) => {
+    const res = await fetch(`/api/content/${key}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return res.ok;
+  };
+
+  const saveProductExtra = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setOk(null); setBusy(true);
     try {
-      const raw = targetTab === 'materials' ? materialsJson : servicesJson;
-      const parsed = JSON.parse(raw);
-      const res = await fetch(`/api/content/${targetTab}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed),
-      });
-      if (!res.ok) throw new Error('Ошибка сохранения JSON');
-      setOk('Справочник сохранен!');
+      const ok = await putContent('product_extra', productExtra);
+      if (!ok) throw new Error('Ошибка сохранения');
+      setOk('Общий текст для товаров сохранён!');
       setTimeout(() => setOk(null), 4000);
       router.refresh();
-    } catch {
-      setErr('Некорректный JSON: проверьте синтаксис');
-    } finally {
-      setBusy(false);
-    }
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally { setBusy(false); }
+  };
+
+  const saveMaterials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setOk(null); setBusy(true);
+    try {
+      const ok = await putContent('materials', materials);
+      if (!ok) throw new Error('Ошибка сохранения');
+      setOk('Материалы сохранены! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally { setBusy(false); }
+  };
+
+  const saveServices = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setOk(null); setBusy(true);
+    try {
+      const ok = await putContent('services', services);
+      if (!ok) throw new Error('Ошибка сохранения');
+      setOk('Услуги сохранены! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally { setBusy(false); }
   };
 
   // Filtered files
@@ -632,16 +678,22 @@ export default function ContentEditor({ initial }: Props) {
           📞 Контакты
         </button>
         <button
+          className={mainMode === 'products' ? 'on' : ''}
+          onClick={() => { setMainMode('products'); setErr(null); setOk(null); }}
+        >
+          🧾 Товары
+        </button>
+        <button
+          className={mainMode === 'refs' ? 'on' : ''}
+          onClick={() => { setMainMode('refs'); setErr(null); setOk(null); }}
+        >
+          📚 Материалы и услуги
+        </button>
+        <button
           className={mainMode === 'media' ? 'on' : ''}
           onClick={() => { setMainMode('media'); setErr(null); setOk(null); loadFiles(); }}
         >
           📁 Файлы и документы {files.length > 0 && `(${files.length})`}
-        </button>
-        <button
-          className={mainMode === 'other' ? 'on' : ''}
-          onClick={() => { setMainMode('other'); setErr(null); setOk(null); }}
-        >
-          📋 Справочники (JSON)
         </button>
       </div>
 
@@ -1362,34 +1414,59 @@ export default function ContentEditor({ initial }: Props) {
       {/* ========================================================
           MODE 4: OTHER JSON DATA
           ======================================================== */}
-      {mainMode === 'other' && (
-        <div className="a-card">
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 14 }}>Справочник материалов и ГОСТов (JSON)</h3>
-          <div className="field">
-            <textarea
-              className="json"
-              rows={12}
-              value={materialsJson}
-              onChange={(e) => setMaterialsJson(e.target.value)}
-            />
+      {/* ========================================================
+          MODE 7: SHARED PRODUCT TEXTS
+          ======================================================== */}
+      {mainMode === 'products' && (
+        <form className="aform" onSubmit={saveProductExtra}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Общий текст на странице товара</h3>
+          <ProductExtraEditor value={productExtra} onChange={setProductExtra} />
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить'}
+            </button>
           </div>
-          <button className="btn primary" style={{ marginBottom: 28 }} onClick={() => saveJson('materials')} disabled={busy}>
-            💾 Сохранить материалы
-          </button>
+        </form>
+      )}
 
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 14 }}>Справочник услуг (JSON)</h3>
-          <div className="field">
-            <textarea
-              className="json"
-              rows={12}
-              value={servicesJson}
-              onChange={(e) => setServicesJson(e.target.value)}
-            />
+      {/* ========================================================
+          MODE 8: MATERIALS & SERVICES
+          ======================================================== */}
+      {mainMode === 'refs' && (
+        <>
+          <div className="a-tabs" style={{ marginBottom: 14 }}>
+            <button className={refsTab === 'materials' ? 'on' : ''} onClick={() => setRefsTab('materials')}>
+              📄 Материалы
+            </button>
+            <button className={refsTab === 'services' ? 'on' : ''} onClick={() => setRefsTab('services')}>
+              ⚙️ Услуги
+            </button>
           </div>
-          <button className="btn primary" onClick={() => saveJson('services')} disabled={busy}>
-            💾 Сохранить услуги
-          </button>
-        </div>
+
+          {refsTab === 'materials' && (
+            <form className="aform" onSubmit={saveMaterials}>
+              <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Материалы и нормативы</h3>
+              <MaterialsEditor items={materials} onChange={setMaterials} busy={busy} />
+              <div className="form-actions" style={{ marginTop: 24 }}>
+                <button className="btn primary" disabled={busy}>
+                  {busy ? '…' : '💾 Сохранить материалы'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {refsTab === 'services' && (
+            <form className="aform" onSubmit={saveServices}>
+              <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Услуги</h3>
+              <ServicesEditor items={services} onChange={setServices} busy={busy} />
+              <div className="form-actions" style={{ marginTop: 24 }}>
+                <button className="btn primary" disabled={busy}>
+                  {busy ? '…' : '💾 Сохранить услуги'}
+                </button>
+              </div>
+            </form>
+          )}
+        </>
       )}
 
       {/* ========================================================

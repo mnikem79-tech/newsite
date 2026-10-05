@@ -1,7 +1,7 @@
 import { q } from '@/lib/db';
 import { getDefaultSections } from '@/lib/default-sections';
 import ContentEditor from './content-editor';
-import type { ChromeBlock, PageSection } from '@/lib/types';
+import type { ChromeBlock, MaterialItem, PageSection, ProductExtra, ServiceItem } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +33,7 @@ export default async function AdminContent() {
     sec_checkout,
     header_blocks,
     footer_blocks,
+    product_extra,
   ] = await Promise.all([
     getKey('home_hero'),
     getKey('about_intro'),
@@ -51,6 +52,7 @@ export default async function AdminContent() {
     getKey('sections_checkout'),
     getKey('header'),
     getKey('footer'),
+    getKey('product_extra'),
   ]);
 
   const prepareSections = (pageKey: string, raw: unknown): PageSection[] => {
@@ -112,11 +114,12 @@ export default async function AdminContent() {
           about_intro: (about_intro ?? null) as Record<string, string> | null,
           contacts: (contacts ?? null) as Record<string, string> | null,
           site: (site ?? null) as Record<string, string> | null,
-          materials: (materials ?? null) as unknown[],
-          services: (services ?? null) as unknown[],
+          materials: (materials ?? null) as MaterialItem[] | null,
+          services: (services ?? null) as ServiceItem[] | null,
           sections,
           header: header_blocks as ChromeBlock[] | null,
           footer: footer_blocks as ChromeBlock[] | null,
+          product_extra: product_extra as ProductExtra | null,
         }}
       />
     </>
