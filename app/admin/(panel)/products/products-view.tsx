@@ -1,8 +1,10 @@
 'use client';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import ProductActions from './product-actions';
+import ProductEditModal, { type ProductFormValues } from './product-edit-modal';
+import { ProductExtraEditor } from '../content/refs-editor';
+import type { ProductExtra } from '@/lib/types';
 
 export interface CategoryItem {
   id: number;
@@ -19,23 +21,43 @@ export interface ProductItem {
   id: number;
   code: string;
   name_ru: string;
+  description_ru: string;
+  supply_ru: string | null;
+  features_ru: string[] | null;
+  detail_html: string | null;
   cat_code: string;
   cat_ru: string;
   category_id: number;
   price: number | string | null;
+  price_note: string | null;
   is_active: boolean;
+  icon: string;
 }
 
 interface Props {
   products: ProductItem[];
   categories: CategoryItem[];
+  productExtra: ProductExtra | null;
 }
 
-export default function ProductsView({ products, categories: initialCategories }: Props) {
+export default function ProductsView({
+  products,
+  categories: initialCategories,
+  productExtra: initialProductExtra,
+}: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'categories' ? 'categories' : 'products';
-  const [tab, setTab] = useState<'products' | 'categories'>(initialTab);
+  const [tab, setTab] = useState<'products' | 'categories' | 'settings'>(initialTab);
+
+  // Product editor popup
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<ProductFormValues | null>(null);
+
+  // Shared product texts
+  const [productExtra, setProductExtra] = useState<ProductExtra>(
+    () => initialProductExtra ?? { supply_ru: '', features_ru: [] }
+  );
 
   // Categories management state
   const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
@@ -164,6 +186,12 @@ export default function ProductsView({ products, categories: initialCategories }
         >
           📁 Разделы каталога ({categories.length})
         </button>
+        <button
+          className={tab === 'settings' ? 'on' : ''}
+          onClick={() => setTab('settings')}
+        >
+          ⚙️ Настройки товаров
+        </button>
       </div>
 
       {/* ========================================================
@@ -176,9 +204,15 @@ export default function ProductsView({ products, categories: initialCategories }
               <h2 style={{ fontSize: 20, margin: 0 }}>Товары каталога</h2>
               <div className="sub">{products.length} позиций в каталоге</div>
             </div>
-            <Link href="/admin/products/new" className="btn primary sm">
+            <button
+              className="btn primary sm"
+              onClick={() => {
+                setEditingProduct(null);
+                setEditOpen(true);
+              }}
+            >
               + Добавить товар
-            </Link>
+            </button>
           </div>
 
           <div className="atable-wrap">
@@ -211,7 +245,28 @@ export default function ProductsView({ products, categories: initialCategories }
                     </td>
                     <td>
                       <div className="act">
-                        <Link href={`/admin/products/${p.id}`} className="mini-btn">Изменить</Link>
+                        <button
+                          className="mini-btn"
+                          onClick={() => {
+                            setEditingProduct({
+                              id: p.id,
+                              code: p.code,
+                              category_id: p.category_id,
+                              name_ru: p.name_ru,
+                              description_ru: p.description_ru,
+                              supply_ru: p.supply_ru,
+                              features_ru: p.features_ru,
+                              detail_html: p.detail_html,
+                              price: p.price,
+                              price_note: p.price_note,
+                              is_active: p.is_active,
+                              icon: p.icon,
+                            });
+                            setEditOpen(true);
+                          }}
+                        >
+                          Изменить
+                        </button>
                         <ProductActions id={p.id} name={p.name_ru} />
                       </div>
                     </td>
@@ -300,6 +355,61 @@ export default function ProductsView({ products, categories: initialCategories }
       {/* ========================================================
           MODAL: ADD / EDIT CATEGORY
           ======================================================== */}
+      {/* ========================================================
+          TAB 3: PRODUCT SETTINGS (общий текст на странице товара)
+          ======================================================== */}
+      {tab === 'settings' && (
+        <form
+          className="aform"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setErr(null);
+            setOk(null);
+            setBusy(true);
+            try {
+              const res = await fetch('/api/content/product_extra', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productExtra),
+              });
+              if (!res.ok) throw new Error('Ошибка сохранения');
+              setOk('Настройки товаров сохранены! Изменения появятся на сайте в течение ~30 секунд.');
+              setTimeout(() => setOk(null), 4000);
+              router.refresh();
+            } catch (ex) {
+              setErr(ex instanceof Error ? ex.message : String(ex));
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <div className="a-head">
+            <div>
+              <h2 style={{ fontSize: 20, margin: 0 }}>Настройки товаров</h2>
+              <div className="sub">
+                Общий текст и галочки, которые показываются на странице каждого товара, если у товара не заданы свои.
+              </div>
+            </div>
+          </div>
+          <ProductExtraEditor value={productExtra} onChange={setProductExtra} />
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить настройки'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Попап редактирования товара */}
+      {editOpen && (
+        <ProductEditModal
+          categories={categories}
+          initial={editingProduct}
+          onClose={() => setEditOpen(false)}
+          onSaved={() => router.refresh()}
+        />
+      )}
+
       {modalOpen && (
         <div
           style={{

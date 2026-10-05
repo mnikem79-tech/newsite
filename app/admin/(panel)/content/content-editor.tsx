@@ -1,11 +1,11 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import type { ChromeBlock, MaterialItem, PageSection, ProductExtra, ServiceItem, UploadedFile } from '@/lib/types';
+import type { ChromeBlock, MaterialItem, PageSection, ServiceItem, UploadedFile } from '@/lib/types';
 import { getDefaultSections } from '@/lib/default-sections';
 import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
 import ChromeEditor from './chrome-editor';
-import { MaterialsEditor, ServicesEditor, ProductExtraEditor } from './refs-editor';
+import { MaterialsEditor, ServicesEditor } from './refs-editor';
 
 const PAGES = [
   { id: 'home', title: '🏠 Главная' },
@@ -179,7 +179,6 @@ interface Props {
     sections: Record<string, PageSection[]>;
     header: ChromeBlock[] | null;
     footer: ChromeBlock[] | null;
-    product_extra: ProductExtra | null;
     materials: MaterialItem[] | null;
     services: ServiceItem[] | null;
   };
@@ -190,7 +189,7 @@ export default function ContentEditor({ initial }: Props) {
 
   // Top navigation mode
   const [mainMode, setMainMode] = useState<
-    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'products' | 'refs' | 'media'
+    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'refs' | 'media'
   >('builder');
   // sub-tab inside «Справочники»
   const [refsTab, setRefsTab] = useState<'materials' | 'services'>('materials');
@@ -224,15 +223,6 @@ export default function ContentEditor({ initial }: Props) {
   );
   const [footerBlocks, setFooterBlocks] = useState<ChromeBlock[]>(() =>
     initial.footer?.length ? sanitizeChrome(initial.footer, 'footer') : defaultChromeBlocks('footer')
-  );
-
-  // Shared text on product pages
-  const [productExtra, setProductExtra] = useState<ProductExtra>(
-    () =>
-      initial.product_extra ?? {
-        supply_ru: '',
-        features_ru: [],
-      }
   );
 
   // Reference lists (materials & services)
@@ -578,20 +568,6 @@ export default function ContentEditor({ initial }: Props) {
     return res.ok;
   };
 
-  const saveProductExtra = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null); setOk(null); setBusy(true);
-    try {
-      const ok = await putContent('product_extra', productExtra);
-      if (!ok) throw new Error('Ошибка сохранения');
-      setOk('Общий текст для товаров сохранён!');
-      setTimeout(() => setOk(null), 4000);
-      router.refresh();
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : String(ex));
-    } finally { setBusy(false); }
-  };
-
   const saveMaterials = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setOk(null); setBusy(true);
@@ -676,12 +652,6 @@ export default function ContentEditor({ initial }: Props) {
           onClick={() => { setMainMode('contacts'); setErr(null); setOk(null); }}
         >
           📞 Контакты
-        </button>
-        <button
-          className={mainMode === 'products' ? 'on' : ''}
-          onClick={() => { setMainMode('products'); setErr(null); setOk(null); }}
-        >
-          🧾 Товары
         </button>
         <button
           className={mainMode === 'refs' ? 'on' : ''}
@@ -1415,22 +1385,7 @@ export default function ContentEditor({ initial }: Props) {
           MODE 4: OTHER JSON DATA
           ======================================================== */}
       {/* ========================================================
-          MODE 7: SHARED PRODUCT TEXTS
-          ======================================================== */}
-      {mainMode === 'products' && (
-        <form className="aform" onSubmit={saveProductExtra}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Общий текст на странице товара</h3>
-          <ProductExtraEditor value={productExtra} onChange={setProductExtra} />
-          <div className="form-actions" style={{ marginTop: 24 }}>
-            <button className="btn primary" disabled={busy}>
-              {busy ? '…' : '💾 Сохранить'}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* ========================================================
-          MODE 8: MATERIALS & SERVICES
+          MODE 7: MATERIALS & SERVICES
           ======================================================== */}
       {mainMode === 'refs' && (
         <>

@@ -1,7 +1,7 @@
 'use client';
-import Link from 'next/link';
 import { useState } from 'react';
-import type { Category, Product } from '@/lib/types';
+import type { Category, Product, ProductExtra } from '@/lib/types';
+import ProductModal from './ProductModal';
 
 export function formatPrice(n: number) {
   return new Intl.NumberFormat('ru-RU').format(n);
@@ -11,12 +11,15 @@ export default function CatalogClient({
   categories,
   products,
   initialCat,
+  productExtra,
 }: {
   categories: Category[];
   products: Product[];
   initialCat: string;
+  productExtra: ProductExtra;
 }) {
   const [cat, setCat] = useState(initialCat);
+  const [openProduct, setOpenProduct] = useState<Product | null>(null);
   const visible = cat === 'all' ? categories : categories.filter((c) => c.slug === cat);
 
   return (
@@ -43,7 +46,7 @@ export default function CatalogClient({
             {products
               .filter((p) => p.category_id === c.id)
               .map((p) => (
-                <Link key={p.id} href={`/catalog/${p.slug}`} className="pcard">
+                <div key={p.id} className="pcard">
                   <div className="ph">
                     <div className="pic">{p.icon}</div>
                     <h3>{p.name_ru}</h3>
@@ -55,15 +58,27 @@ export default function CatalogClient({
                     ) : (
                       <span className="price ask">Цена по запросу</span>
                     )}
-                    <span style={{ color: 'var(--acc)', fontWeight: 700, fontSize: 13.5 }}>
+                    <button
+                      type="button"
+                      className="pcard-more"
+                      onClick={() => setOpenProduct(p)}
+                    >
                       Подробнее →
-                    </span>
+                    </button>
                   </div>
-                </Link>
+                </div>
               ))}
           </div>
         </div>
       ))}
+
+      {openProduct && (
+        <ProductModal
+          product={openProduct}
+          extra={productExtra}
+          onClose={() => setOpenProduct(null)}
+        />
+      )}
     </>
   );
 }

@@ -4,7 +4,7 @@ import { getDefaultSections } from './default-sections';
 import type {
   AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, ProductExtra, ServiceItem, SiteSettings,
 } from './types';
-import { sanitizeChrome } from './chrome';
+import { DEFAULT_PRODUCT_EXTRA, sanitizeChrome } from './chrome';
 
 const D = seed.contentDefaults as {
   home_hero: HomeHero;
@@ -44,16 +44,6 @@ export async function getServices(): Promise<ServiceItem[]> {
   const d = (await getContentCached('services')) as ServiceItem[] | null;
   return d?.length ? d : D.services;
 }
-
-const DEFAULT_PRODUCT_EXTRA: ProductExtra = {
-  supply_ru:
-    'Поставка по всей России и странам СНГ. Оборудование сопровождается полным пакетом разрешительной документации, сертификатами и декларациями о соответствии.',
-  features_ru: [
-    'Работа по ГОСТ и ТР, полная документация',
-    'Возможна разработка по требованиям заказчика',
-    'Инженерное сопровождение: расчёты, пусконаладка',
-  ],
-};
 
 /** Shared "supply" text and feature checkmarks for product pages. */
 export async function getProductExtra(): Promise<ProductExtra> {

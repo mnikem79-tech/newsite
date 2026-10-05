@@ -17,6 +17,7 @@ export interface Product {
   description_ru: string;
   supply_ru: string | null;
   features_ru: string[] | null;
+  detail_html: string | null;
   price: number | null;
   price_note: string | null;
   is_active: boolean;

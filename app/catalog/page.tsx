@@ -1,5 +1,5 @@
 import { q } from '@/lib/db';
-import { getPageSections } from '@/lib/content';
+import { getPageSections, getProductExtra } from '@/lib/content';
 import { SectionRenderer } from '@/components/SectionRenderer';
 import type { Category, Product } from '@/lib/types';
 
@@ -23,6 +23,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
   }
 
   const sections = await getPageSections('catalog');
+  const productExtra = await getProductExtra();
 
   return (
     <SectionRenderer
@@ -30,6 +31,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
       catalogCategories={categories}
       catalogProducts={products}
       initialCat={cat ?? 'all'}
+      productExtra={productExtra}
     />
   );
 }
