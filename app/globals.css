@@ -994,11 +994,15 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
 
 /* ---- flexible header / footer blocks ---- */
 .chrome-blocks{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
+.chrome-blocks .cb{display:flex;align-items:center;gap:14px;min-width:0}
+/* выравнивание блока: слева / по центру / справа */
+.chrome-blocks .cb--start{margin-right:auto}
+.chrome-blocks .cb--center{margin-inline:auto}
+.chrome-blocks .cb--end{margin-left:auto}
 .chrome-topbar{justify-content:space-between;height:38px;gap:14px;font-size:13px;color:var(--muted)}
 .chrome-topbar .cb-topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .chrome-topbar .cb-topbar b{color:var(--txt);font-weight:600}
 .chrome-nav{flex:1 1 auto;min-width:0;align-items:center;gap:14px}
-.chrome-nav .cb-menu{margin-left:auto}
 .chrome-nav .cb-phone a,.chrome-nav .cb-email a{font-size:14px;color:var(--muted);white-space:nowrap}
 .chrome-nav .cb-phone a:hover,.chrome-nav .cb-email a:hover{color:var(--acc)}
 .chrome-nav .cb-phone .cb-strong{color:var(--txt);font-weight:700}
@@ -1008,6 +1012,9 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
 .chrome-nav .cb-html>*{max-width:100%}
 
 .chrome-foot{align-items:flex-start;gap:28px}
+.chrome-foot .cb{flex-direction:column;align-items:flex-start;gap:0}
+.chrome-foot .cb--center{align-items:center}
+.chrome-foot .cb--end{align-items:flex-end}
 .chrome-foot .cb-logo .brand-row{display:flex;gap:12px;align-items:center;margin-bottom:16px}
 .chrome-foot .cb-logo .logo-img{height:52px;width:auto;max-width:100%;object-fit:contain;aspect-ratio:1121/272;display:block}
 .chrome-foot .cb-logo .name .t{font-weight:800;font-size:17px;letter-spacing:.5px}
@@ -1020,11 +1027,28 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
 .chrome-foot ul li a.cb-strong{color:var(--txt);font-weight:600}
 .chrome-copy{justify-content:space-between;flex-wrap:wrap;gap:10px}
 
+/* ---- шапка и подвал на узких экранах ---- */
 @media (max-width: 900px){
-  .chrome-nav .cb-menu{position:absolute;top:70px;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:#0a1120;border-bottom:1px solid var(--line);padding:10px 16px 16px;display:none;margin-left:0}
+  /* выравнивание отключаем: блоки выстраиваются в столбик и переносятся */
+  .chrome-nav .cb,
+  .chrome-foot .cb,
+  .chrome-topbar .cb{margin-left:0;margin-right:0}
+
+  .chrome-nav{gap:10px;height:auto;min-height:64px;padding:10px 0}
+  .chrome-nav .cb-menu{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:#0a1120;border-bottom:1px solid var(--line);padding:10px 16px 16px;display:none;z-index:40}
   .chrome-nav.open .cb-menu{display:flex}
   .chrome-nav .cb-menu a{padding:12px 13px;font-size:15px}
+  /* телефон, кнопка и соцсети держим справа, логотип слева */
+  .chrome-nav .cb--phone,
+  .chrome-nav .cb--button,
+  .chrome-nav .cb--socials{margin-left:auto}
+
+  .chrome-topbar{height:auto;min-height:34px;padding:6px 0;font-size:12px}
+  .chrome-topbar .cb{width:100%}
+
   .chrome-foot{flex-direction:column;gap:22px}
+  .chrome-foot .cb{align-items:flex-start}
+  .chrome-foot .cb--center,.chrome-foot .cb--end{align-items:flex-start}
 }
 
 /* ---- product popup («Подробнее») ---- */
@@ -1099,3 +1123,9 @@ textarea.json{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;m
   .pt-row .pt-text{flex:1 1 100%}
 }
 .builder-page-btn.off{opacity:.45;text-decoration:line-through}
+
+/* ---- выбор выравнивания блока шапки/подвала ---- */
+.align-picker{display:flex;gap:6px;flex-wrap:wrap}
+.align-opt{flex:1 1 auto;min-width:96px;padding:9px 10px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;color:var(--muted);font-size:13px;cursor:pointer;transition:.15s;font-family:inherit}
+.align-opt:hover{background:rgba(255,255,255,.11);color:var(--txt)}
+.align-opt.on{background:linear-gradient(135deg,var(--acc),#1fb0c4);color:#06313c;font-weight:700;border-color:transparent}

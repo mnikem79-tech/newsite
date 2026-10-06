@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ChromeBlock, ContactInfo, PageItem, SiteSettings } from '@/lib/types';
+import type { ChromeBlock, ChromeAlign, ContactInfo, PageItem } from '@/lib/types';
 import { kindDef } from '@/lib/chrome';
 
 function parseLines(lines?: string): { text: string; href: string }[] {
@@ -19,12 +19,10 @@ function parseLines(lines?: string): { text: string; href: string }[] {
 
 export default function ChromeRenderer({
   blocks,
-  site,
   contacts,
   pages = [],
 }: {
   blocks: ChromeBlock[];
-  site: SiteSettings;
   contacts: ContactInfo;
   pages?: PageItem[];
 }) {
@@ -32,8 +30,8 @@ export default function ChromeRenderer({
   const menuItems = pages
     .filter((p) => p.is_active && p.in_menu && p.slug !== 'home')
     .map((p) => ({
-      href: p.slug === 'home' ? '/' : `/${p.slug}`,
-      label: site[`nav_${p.slug}_ru`] || p.title_ru,
+      href: `/${p.slug}`,
+      label: p.title_ru,
     }));
   const pathname = usePathname();
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
@@ -44,7 +42,8 @@ export default function ChromeRenderer({
         .filter((b) => b.is_active)
         .map((b) => {
           const def = kindDef(b.kind);
-          const cls = `cb cb-${b.kind}`;
+          const align: ChromeAlign = b.align ?? 'start';
+          const cls = `cb cb-${b.kind} cb--${align}`;
 
           if (b.kind === 'topbar') {
             if (!b.text?.trim()) return null;
@@ -155,13 +154,22 @@ export default function ChromeRenderer({
           }
 
           if (b.kind === 'socials') {
-            const url = site.telegram_url || contacts.telegram_url;
+            const url = (b.href ?? '').trim() || contacts.telegram_url;
             if (!url) return null;
             return (
               <div className={cls} key={b.id}>
                 <a href={url} target="_blank" rel="noreferrer">
                   <span className="dot">✈</span> {b.text?.trim() || 'Telegram'}
                 </a>
+              </div>
+            );
+          }
+
+          if (b.kind === 'text') {
+            if (!b.text?.trim()) return null;
+            return (
+              <div className={cls} key={b.id}>
+                <span>{b.text}</span>
               </div>
             );
           }

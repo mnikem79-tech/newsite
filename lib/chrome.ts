@@ -1,4 +1,4 @@
-import type { ChromeBlock, ChromeKind } from './types';
+import type { ChromeAlign, ChromeBlock, ChromeKind } from './types';
 
 export type ChromeArea = 'header' | 'footer';
 
@@ -73,9 +73,9 @@ export const CHROME_KINDS: ChromeKindDef[] = [
   {
     kind: 'socials',
     label: 'Ссылка на Telegram',
-    hint: 'Кнопка-ссылка на Telegram-канал из настроек шапки.',
+    hint: 'Кнопка-ссылка на Telegram-канал. Адрес канала задаётся прямо в блоке.',
     area: 'both',
-    fields: ['text'],
+    fields: ['text', 'href'],
   },
   {
     kind: 'button',
@@ -96,6 +96,13 @@ export const CHROME_KINDS: ChromeKindDef[] = [
     label: 'Копирайт (низ подвала)',
     hint: 'Текст в самой нижней строке подвала.',
     area: 'footer',
+    fields: ['text'],
+  },
+  {
+    kind: 'text',
+    label: 'Текст',
+    hint: 'Произвольная строка текста — например, короткое описание компании в подвале.',
+    area: 'both',
     fields: ['text'],
   },
   {
@@ -129,6 +136,7 @@ export function makeBlock(kind: ChromeKind, area: ChromeArea): ChromeBlock {
     kind,
     name: def.label,
     is_active: true,
+    align: 'start',
   };
   switch (kind) {
     case 'topbar':
@@ -139,6 +147,10 @@ export function makeBlock(kind: ChromeKind, area: ChromeArea): ChromeBlock {
       break;
     case 'socials':
       b.text = 'Telegram-канал';
+      b.href = '';
+      break;
+    case 'text':
+      b.text = '';
       break;
     case 'button':
       b.text = 'Написать нам';
@@ -192,6 +204,7 @@ export function sanitizeChrome(raw: unknown, area: ChromeArea): ChromeBlock[] {
       kind: b.kind,
       name: typeof b.name === 'string' && b.name ? b.name : kindDef(b.kind).label,
       is_active: b.is_active !== false,
+      align: b.align === 'center' || b.align === 'end' ? b.align : 'start',
       text: typeof b.text === 'string' ? b.text : undefined,
       href: typeof b.href === 'string' ? b.href : undefined,
       html_ru: typeof b.html_ru === 'string' ? b.html_ru : undefined,

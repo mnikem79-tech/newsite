@@ -158,14 +158,19 @@ export type ChromeKind =
   | 'socials'
   | 'button'
   | 'links'
+  | 'text'
   | 'copyright'
   | 'html';
+
+export type ChromeAlign = 'start' | 'center' | 'end';
 
 export interface ChromeBlock {
   id: string;
   kind: ChromeKind;
   name: string;
   is_active: boolean;
+  /** Horizontal position of the block: left / centre / right */
+  align?: ChromeAlign;
   /** Main text / label of the block (or description under the logo) */
   text?: string;
   /** Link address for button / logo / socials */

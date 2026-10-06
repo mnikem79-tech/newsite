@@ -3,15 +3,13 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useCart } from './CartProvider';
 import ChromeRenderer from './ChromeRenderer';
-import type { ChromeBlock, ContactInfo, PageItem, SiteSettings } from '@/lib/types';
+import type { ChromeBlock, ContactInfo, PageItem } from '@/lib/types';
 
 export default function Header({
-  site,
   contacts,
   blocks,
   pages,
 }: {
-  site: SiteSettings;
   contacts: ContactInfo;
   blocks: ChromeBlock[];
   pages: PageItem[];
@@ -28,14 +26,14 @@ export default function Header({
       {topbar.length > 0 && (
         <div className="topbar">
           <div className="wrap chrome-blocks chrome-topbar">
-            <ChromeRenderer blocks={topbar} site={site} contacts={contacts} />
+            <ChromeRenderer blocks={topbar} contacts={contacts} />
           </div>
         </div>
       )}
       <header>
         <div className="wrap nav">
           <div className={`chrome-blocks chrome-nav ${open ? 'open' : ''}`}>
-            <ChromeRenderer blocks={nav} site={site} contacts={contacts} pages={pages} />
+            <ChromeRenderer blocks={nav} contacts={contacts} pages={pages} />
           </div>
           <div className="nav-right">
             <a href="/cart" className={`cartlink ${pathname === '/cart' ? 'active' : ''}`} aria-label="Корзина">

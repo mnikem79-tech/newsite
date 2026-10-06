@@ -122,6 +122,32 @@ export default function ChromeEditor({
                   <p style={{ fontSize: 12.5, color: 'var(--muted)', margin: '12px 0' }}>{def.hint}</p>
 
                   <div className="field">
+                    <label>Выравнивание блока</label>
+                    <div className="align-picker">
+                      {([
+                        { v: 'start', label: '⬅ Слева', title: 'Блок прижмётся к левому краю' },
+                        { v: 'center', label: '↔ По центру', title: 'Блок встанет по центру' },
+                        { v: 'end', label: '➡ Справа', title: 'Блок прижмётся к правому краю' },
+                      ] as const).map((o) => (
+                        <button
+                          key={o.v}
+                          type="button"
+                          className={`align-opt${(b.align ?? 'start') === o.v ? ' on' : ''}`}
+                          title={o.title}
+                          onClick={() => patch(b.id, { align: o.v })}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 6 }}>
+                      {area === 'header'
+                        ? 'Обычно: логотип слева, меню по центру, телефон и кнопка справа. На узком экране блоки выстраиваются в столбик автоматически.'
+                        : 'Задаёт, в какой части подвала стоит колонка. На телефоне все колонки выстраиваются в один столбик.'}
+                    </div>
+                  </div>
+
+                  <div className="field">
                     <label>Название блока (видно только в админке)</label>
                     <input
                       value={b.name}

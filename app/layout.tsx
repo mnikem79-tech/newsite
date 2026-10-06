@@ -4,7 +4,7 @@ import { CartProvider } from '@/components/CartProvider';
 import RevealAll from '@/components/RevealAll';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getContacts, getSite, getChromeBlocks, getMenuPages } from '@/lib/content';
+import { getContacts, getChromeBlocks, getMenuPages } from '@/lib/content';
 import type { ChromeBlock, PageItem } from '@/lib/types';
 
 export const metadata: Metadata = {
@@ -15,11 +15,6 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#0a1120' };
 
-const FALLBACK_SITE = {
-  topbar_ru: 'Пн–Пт 9:00–18:00  ·  +7 (000) 000-00-00  ·  info@newsite.nail-app.ru',
-  footer_ru: '© 2026 Новый сайт',
-  telegram_url: '',
-};
 const FALLBACK_CONTACTS = {
   phone: '+7 (000) 000-00-00',
   phone_href: 'tel:+70000000000',
@@ -30,14 +25,12 @@ const FALLBACK_CONTACTS = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  let site: typeof FALLBACK_SITE = FALLBACK_SITE;
   let contacts: typeof FALLBACK_CONTACTS = FALLBACK_CONTACTS;
   let headerBlocks: ChromeBlock[] = [];
   let footerBlocks: ChromeBlock[] = [];
   let menuPages: PageItem[] = [];
   try {
-    [site, contacts, headerBlocks, footerBlocks, menuPages] = await Promise.all([
-      getSite(),
+    [contacts, headerBlocks, footerBlocks, menuPages] = await Promise.all([
       getContacts(),
       getChromeBlocks('header'),
       getChromeBlocks('footer'),
@@ -52,9 +45,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="ru">
       <body>
         <CartProvider>
-          <Header site={site} contacts={contacts} blocks={headerBlocks} pages={menuPages} />
+          <Header contacts={contacts} blocks={headerBlocks} pages={menuPages} />
           <main>{children}</main>
-          <Footer site={site} contacts={contacts} blocks={footerBlocks} />
+          <Footer contacts={contacts} blocks={footerBlocks} />
           <RevealAll />
         </CartProvider>
       </body>

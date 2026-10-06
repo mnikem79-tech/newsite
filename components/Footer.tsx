@@ -1,14 +1,12 @@
 'use client';
 import Link from 'next/link';
 import ChromeRenderer from './ChromeRenderer';
-import type { ChromeBlock, ContactInfo, SiteSettings } from '@/lib/types';
+import type { ChromeBlock, ContactInfo } from '@/lib/types';
 
 export default function Footer({
-  site,
   contacts,
   blocks,
 }: {
-  site: SiteSettings;
   contacts: ContactInfo;
   blocks: ChromeBlock[];
 }) {
@@ -19,10 +17,10 @@ export default function Footer({
     <footer>
       <div className="wrap">
         <div className="foot-grid chrome-blocks chrome-foot">
-          <ChromeRenderer blocks={body} site={site} contacts={contacts} />
+          <ChromeRenderer blocks={body} contacts={contacts} />
         </div>
         <div className="fcopy chrome-blocks chrome-copy">
-          <ChromeRenderer blocks={copy} site={site} contacts={contacts} />
+          <ChromeRenderer blocks={copy} contacts={contacts} />
           <span>
             <Link href="/admin">Админ-панель</Link>
           </span>

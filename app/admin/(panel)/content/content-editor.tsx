@@ -165,7 +165,6 @@ interface Props {
     home_hero: Record<string, string> | null;
     about_intro: Record<string, string> | null;
     contacts: Record<string, string> | null;
-    site: Record<string, string> | null;
     sections: Record<string, PageSection[]>;
     header: ChromeBlock[] | null;
     footer: ChromeBlock[] | null;
@@ -180,7 +179,7 @@ export default function ContentEditor({ initial }: Props) {
 
   // Top navigation mode
   const [mainMode, setMainMode] = useState<
-    'builder' | 'header' | 'footer' | 'chrome' | 'contacts' | 'refs' | 'media'
+    'builder' | 'header' | 'footer' | 'contacts' | 'refs' | 'media'
   >('builder');
   // sub-tab inside «Справочники»
   const [refsTab, setRefsTab] = useState<'materials' | 'services'>('materials');
@@ -230,7 +229,6 @@ export default function ContentEditor({ initial }: Props) {
 
   // Legacy & global states
   const [contacts, setContacts] = useState(initial.contacts);
-  const [site, setSite] = useState(initial.site);
 
   // Status
   const [err, setErr] = useState<string | null>(null);
@@ -469,28 +467,6 @@ export default function ContentEditor({ initial }: Props) {
   };
 
   // Save header & footer settings
-  const saveChrome = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null);
-    setOk(null);
-    setBusy(true);
-    try {
-      const res = await fetch('/api/content/site', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(site),
-      });
-      if (!res.ok) throw new Error('Ошибка сохранения');
-      setOk('Шапка и подвал сохранены! Изменения появятся на сайте в течение ~30 секунд.');
-      setTimeout(() => setOk(null), 4000);
-      router.refresh();
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : String(ex));
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const saveHeader = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setOk(null); setBusy(true);
@@ -635,12 +611,6 @@ export default function ContentEditor({ initial }: Props) {
           onClick={() => { setMainMode('footer'); setErr(null); setOk(null); }}
         >
           🦶 Подвал
-        </button>
-        <button
-          className={mainMode === 'chrome' ? 'on' : ''}
-          onClick={() => { setMainMode('chrome'); setErr(null); setOk(null); }}
-        >
-          ⚙️ Настройки шапки и подвала
         </button>
         <button
           className={mainMode === 'contacts' ? 'on' : ''}
@@ -1274,72 +1244,7 @@ export default function ContentEditor({ initial }: Props) {
       )}
 
       {/* ========================================================
-          MODE 4: HEADER & FOOTER SETTINGS
-          ======================================================== */}
-      {mainMode === 'chrome' && (
-        <form className="aform" onSubmit={saveChrome}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>Общие настройки шапки и подвала</h3>
-          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
-            Текст верхней полоски, текст в подвале и кнопки Telegram теперь задаются во вкладках
-            «🧭 Шапка» и «🦶 Подвал» — там же меняется порядок блоков. Здесь остаются только настройки,
-            которые используют сами блоки.
-          </p>
-          <div className="field">
-            <label>Ссылка на Telegram</label>
-            <input value={site?.telegram_url ?? ''} onChange={(e) => setSite((p) => ({ ...(p ?? {}), telegram_url: e.target.value }))} />
-          </div>
-
-          <h3 style={{ fontSize: 17, fontWeight: 700, marginTop: 28, marginBottom: 12 }}>Названия разделов в верхнем меню сайта</h3>
-          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
-            Здесь можно переименовать пункты меню в шапке сайта. Если оставить поле пустым — будет стандартное название.
-          </p>
-          <div className="frow">
-            <div className="field">
-              <label>Раздел «Главная»</label>
-              <input value={site?.nav_home_ru ?? ''} placeholder="Главная" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_home_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Раздел «О нас»</label>
-              <input value={site?.nav_about_ru ?? ''} placeholder="О нас" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_about_ru: e.target.value }))} />
-            </div>
-          </div>
-          <div className="frow">
-            <div className="field">
-              <label>Раздел «Каталог»</label>
-              <input value={site?.nav_catalog_ru ?? ''} placeholder="Каталог" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_catalog_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Раздел «Производство»</label>
-              <input value={site?.nav_production_ru ?? ''} placeholder="Производство" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_production_ru: e.target.value }))} />
-            </div>
-          </div>
-          <div className="frow">
-            <div className="field">
-              <label>Раздел «Услуги»</label>
-              <input value={site?.nav_services_ru ?? ''} placeholder="Услуги" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_services_ru: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label>Раздел «Материалы»</label>
-              <input value={site?.nav_materials_ru ?? ''} placeholder="Материалы" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_materials_ru: e.target.value }))} />
-            </div>
-          </div>
-          <div className="frow">
-            <div className="field">
-              <label>Раздел «Контакты»</label>
-              <input value={site?.nav_contacts_ru ?? ''} placeholder="Контакты" onChange={(e) => setSite((p) => ({ ...(p ?? {}), nav_contacts_ru: e.target.value }))} />
-            </div>
-          </div>
-
-          <div className="form-actions" style={{ marginTop: 24 }}>
-            <button className="btn primary" disabled={busy}>
-              {busy ? '…' : '💾 Сохранить шапку и подвал'}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* ========================================================
-          MODE 5: CONTACTS
+          MODE 4: CONTACTS
           ======================================================== */}
       {mainMode === 'contacts' && (
         <form className="aform" onSubmit={saveContacts}>
@@ -1385,7 +1290,7 @@ export default function ContentEditor({ initial }: Props) {
           MODE 4: OTHER JSON DATA
           ======================================================== */}
       {/* ========================================================
-          MODE 7: MATERIALS & SERVICES
+          MODE 6: MATERIALS & SERVICES
           ======================================================== */}
       {mainMode === 'refs' && (
         <>
