@@ -4,6 +4,7 @@ import type { ChromeArea, ChromeKindDef } from '@/lib/chrome';
 import { kindsForArea, makeBlock, kindDef } from '@/lib/chrome';
 import type { ChromeBlock } from '@/lib/types';
 import RichHtmlEditor from '@/components/editor';
+import ImagePicker from '@/components/admin/ImagePicker';
 
 /** Editor for the flexible header / footer: list of blocks, add / edit / reorder / delete. */
 export default function ChromeEditor({
@@ -178,6 +179,15 @@ export default function ChromeEditor({
                         onChange={(e) => patch(b.id, { text: e.target.value })}
                       />
                     </div>
+                  )}
+
+                  {def.fields.includes('image') && (
+                    <ImagePicker
+                      label="Картинка логотипа"
+                      hint="Лучше брать картинку в формате PNG с прозрачным фоном. Пусто — будет показан стандартный логотип."
+                      value={b.image ?? ''}
+                      onChange={(v) => patch(b.id, { image: v })}
+                    />
                   )}
 
                   {def.fields.includes('href') && (

@@ -87,6 +87,16 @@ export interface AboutIntro {
   intro_ru: string;
 }
 
+/** Site-wide settings editable from the admin panel (browser title, favicon). */
+export interface SiteMeta {
+  /** Shown in the browser tab and in search results */
+  title: string;
+  /** Short site description for search engines */
+  description: string;
+  /** URL of the favicon (empty = default /favicon.png) */
+  favicon: string;
+}
+
 /* ============================================================
    PAGE BUILDER & MEDIA TYPES
    ============================================================ */
@@ -172,4 +182,6 @@ export interface ChromeBlock {
   html_ru?: string;
   /** Link list for kind === 'links': one per line, "Название | /url" */
   lines?: string;
+  /** Image URL for kind === 'logo' (empty = default logo) */
+  image?: string;
 }

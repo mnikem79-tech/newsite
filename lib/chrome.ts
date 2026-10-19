@@ -9,7 +9,7 @@ export interface ChromeKindDef {
   /** in which area the block makes sense */
   area: ChromeArea | 'both';
   /** fields shown in the editor */
-  fields: ('text' | 'href' | 'html_ru' | 'lines')[];
+  fields: ('text' | 'href' | 'html_ru' | 'lines' | 'image')[];
 }
 
 /** Ready-made blocks that can be added to the header / footer. */
@@ -24,9 +24,9 @@ export const CHROME_KINDS: ChromeKindDef[] = [
   {
     kind: 'logo',
     label: 'Логотип',
-    hint: 'Картинка логотипа со ссылкой на главную. Вторая строка — подпись под логотипом.',
+    hint: 'Картинка логотипа со ссылкой на главную. Можно загрузить свою картинку или оставить стандартную. Вторая строка — подпись под логотипом.',
     area: 'both',
-    fields: ['text'],
+    fields: ['text', 'image'],
   },
   {
     kind: 'menu',
@@ -144,6 +144,7 @@ export function makeBlock(kind: ChromeKind, area: ChromeArea): ChromeBlock {
       break;
     case 'logo':
       b.text = 'Демонстрационный сайт';
+      b.image = '';
       break;
     case 'socials':
       b.text = 'Telegram-канал';
@@ -209,6 +210,7 @@ export function sanitizeChrome(raw: unknown, area: ChromeArea): ChromeBlock[] {
       href: typeof b.href === 'string' ? b.href : undefined,
       html_ru: typeof b.html_ru === 'string' ? b.html_ru : undefined,
       lines: typeof b.lines === 'string' ? b.lines : undefined,
+      image: typeof b.image === 'string' ? b.image : undefined,
     });
   }
   return out.length ? out : defaultChromeBlocks(area);

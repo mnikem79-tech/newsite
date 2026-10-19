@@ -7,6 +7,7 @@ import { defaultChromeBlocks, sanitizeChrome } from '@/lib/chrome';
 import ChromeEditor from './chrome-editor';
 import PagesManager from './pages-manager';
 import RichHtmlEditor from '@/components/editor';
+import ImagePicker from '@/components/admin/ImagePicker';
 import { MaterialsEditor, ServicesEditor } from './refs-editor';
 
 export function getFileMeta(name: string, mime?: string) {
@@ -165,6 +166,7 @@ interface Props {
     home_hero: Record<string, string> | null;
     about_intro: Record<string, string> | null;
     contacts: Record<string, string> | null;
+    site_meta: Record<string, string> | null;
     sections: Record<string, PageSection[]>;
     header: ChromeBlock[] | null;
     footer: ChromeBlock[] | null;
@@ -179,7 +181,7 @@ export default function ContentEditor({ initial }: Props) {
 
   // Top navigation mode
   const [mainMode, setMainMode] = useState<
-    'builder' | 'header' | 'footer' | 'contacts' | 'refs' | 'media'
+    'builder' | 'header' | 'footer' | 'meta' | 'contacts' | 'refs' | 'media'
   >('builder');
   // sub-tab inside «Справочники»
   const [refsTab, setRefsTab] = useState<'materials' | 'services'>('materials');
@@ -229,6 +231,7 @@ export default function ContentEditor({ initial }: Props) {
 
   // Legacy & global states
   const [contacts, setContacts] = useState(initial.contacts);
+  const [siteMeta, setSiteMeta] = useState<Record<string, string>>(() => (initial.site_meta ?? {}) as Record<string, string>);
 
   // Status
   const [err, setErr] = useState<string | null>(null);
@@ -507,6 +510,29 @@ export default function ContentEditor({ initial }: Props) {
     return res.ok;
   };
 
+  // Save general site settings
+  const saveSiteMeta = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    setOk(null);
+    setBusy(true);
+    try {
+      const res = await fetch('/api/content/site_meta', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(siteMeta),
+      });
+      if (!res.ok) throw new Error('Ошибка сохранения');
+      setOk('Общие настройки сохранены! Изменения появятся на сайте в течение ~30 секунд.');
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   // Save contacts
   const saveContacts = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -611,6 +637,12 @@ export default function ContentEditor({ initial }: Props) {
           onClick={() => { setMainMode('footer'); setErr(null); setOk(null); }}
         >
           🦶 Подвал
+        </button>
+        <button
+          className={mainMode === 'meta' ? 'on' : ''}
+          onClick={() => { setMainMode('meta'); setErr(null); setOk(null); }}
+        >
+          🌐 Общие настройки
         </button>
         <button
           className={mainMode === 'contacts' ? 'on' : ''}
@@ -1238,6 +1270,50 @@ export default function ContentEditor({ initial }: Props) {
           <div className="form-actions" style={{ marginTop: 24 }}>
             <button className="btn primary" disabled={busy}>
               {busy ? '…' : '💾 Сохранить подвал'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ========================================================
+          MODE 4.5: GENERAL SITE SETTINGS
+          ======================================================== */}
+      {mainMode === 'meta' && (
+        <form className="aform" onSubmit={saveSiteMeta}>
+          <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Общие настройки сайта</h3>
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
+            То, что видно во вкладке браузера и в результатах поиска (Яндекс, Google).
+          </p>
+
+          <div className="field">
+            <label>Название сайта (во вкладке браузера)</label>
+            <input
+              value={siteMeta.title ?? ''}
+              onChange={(e) => setSiteMeta((p) => ({ ...p, title: e.target.value }))}
+              placeholder="Например: Оптовые поставки оборудования"
+            />
+          </div>
+
+          <div className="field">
+            <label>Описание сайта (для поисковиков)</label>
+            <textarea
+              rows={3}
+              value={siteMeta.description ?? ''}
+              onChange={(e) => setSiteMeta((p) => ({ ...p, description: e.target.value }))}
+              placeholder="1–2 предложения о том, чем занимается компания"
+            />
+          </div>
+
+          <ImagePicker
+            label="Фавиконка (значок во вкладке браузера)"
+            hint="Квадратная картинка, лучше 64×64 или 128×128 пикселей, формат PNG или ICO. Пусто — значок по умолчанию."
+            value={siteMeta.favicon ?? ''}
+            onChange={(v) => setSiteMeta((p) => ({ ...p, favicon: v }))}
+          />
+
+          <div className="form-actions" style={{ marginTop: 24 }}>
+            <button className="btn primary" disabled={busy}>
+              {busy ? '…' : '💾 Сохранить настройки'}
             </button>
           </div>
         </form>

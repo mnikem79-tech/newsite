@@ -13,6 +13,7 @@ const ALLOWED = [
   'about_intro',
   'contacts',
   'site',
+  'site_meta',
   'header',
   'footer',
   'materials',

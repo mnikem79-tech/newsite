@@ -55,11 +55,18 @@ export default function ChromeRenderer({
           }
 
           if (b.kind === 'logo') {
+            const logoSrc = b.image?.trim() || '/img-1.png';
             return (
               <div className={cls} key={b.id}>
                 <Link href="/" className="brand" title="Новый сайт">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/img-1.png" alt="Новый сайт" className="logo-img" width={1121} height={272} />
+                  <img
+                    src={logoSrc}
+                    alt="Новый сайт"
+                    className="logo-img"
+                    width={1121}
+                    height={272}
+                  />
                   {b.text?.trim() && (
                     <span className="name">
                       <span className="t">{b.text}</span>

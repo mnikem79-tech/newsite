@@ -4,14 +4,30 @@ import { CartProvider } from '@/components/CartProvider';
 import RevealAll from '@/components/RevealAll';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getContacts, getChromeBlocks, getMenuPages } from '@/lib/content';
+import { getContacts, getChromeBlocks, getMenuPages, getSiteMeta } from '@/lib/content';
 import type { ChromeBlock, PageItem } from '@/lib/types';
 
-export const metadata: Metadata = {
-  title: 'Новый сайт',
-  description:
-    'Демонстрационный сайт на готовом движке: каталог товаров, заказы, конструктор страниц и уведомления.',
-};
+const DEFAULT_DESCRIPTION =
+  'Демонстрационный сайт на готовом движке: каталог товаров, заказы, конструктор страниц и уведомления.';
+
+export async function generateMetadata(): Promise<Metadata> {
+  let title = 'Новый сайт';
+  let description = DEFAULT_DESCRIPTION;
+  let favicon = '';
+  try {
+    const meta = await getSiteMeta();
+    title = meta.title || title;
+    description = meta.description || description;
+    favicon = meta.favicon;
+  } catch {
+    // DB unavailable — keep defaults
+  }
+  return {
+    title,
+    description,
+    ...(favicon ? { icons: { icon: favicon, shortcut: favicon, apple: favicon } } : {}),
+  };
+}
 
 export const viewport: Viewport = { themeColor: '#0a1120' };
 
