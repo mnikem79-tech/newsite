@@ -371,7 +371,26 @@ export default function ContentEditor({ initial }: Props) {
     setShowTemplateModal(false);
   };
 
+  const duplicateSection = (id: string) => {
+    const list = currentSections;
+    const idx = list.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const src = list[idx];
+    const copy: PageSection = {
+      ...src,
+      id: `sec-${page}-${Date.now().toString(36)}`,
+      name: `${src.name || 'Раздел'} (копия)`,
+    };
+    const next = [...list];
+    next.splice(idx + 1, 0, copy);
+    setSectionsByPage((prev) => ({ ...prev, [page]: next }));
+    setActiveSecId(copy.id);
+    setOk('Блок скопирован. Не забудьте сохранить страницу.');
+    setTimeout(() => setOk(null), 4000);
+  };
+
   const resetToDefaultSections = () => {
+
     if (!confirm('Сбросить разделы этой страницы к исходным? Все ваши изменения на этой странице будут заменены стандартными блоками.')) return;
     const def = getDefaultSections(page);
     setSectionsByPage((prev) => ({ ...prev, [page]: def }));
@@ -767,6 +786,14 @@ export default function ContentEditor({ initial }: Props) {
                           onClick={() => toggleSectionActive(sec.id)}
                         >
                           {sec.is_active ? '👁️' : '🚫'}
+                        </button>
+                        <button
+                          className="mini-btn"
+                          style={{ padding: '4px 8px' }}
+                          title="Скопировать раздел"
+                          onClick={() => duplicateSection(sec.id)}
+                        >
+                          ⧉
                         </button>
                         <button
                           className="mini-btn red"
