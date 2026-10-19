@@ -23,6 +23,20 @@ export default function OrderDetailClient({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
+  const deleteOrder = async () => {
+    if (!confirm(`Удалить заказ ${order.number}? Действие необратимо — вместе с ним удалятся все товары этого заказа.`)) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/orders/${order.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Не удалось удалить заказ');
+      router.push('/admin/orders');
+      router.refresh();
+    } catch (ex) {
+      alert(ex instanceof Error ? ex.message : String(ex));
+      setBusy(false);
+    }
+  };
+
   const changeStatus = async (s: string) => {
     setBusy(true);
     await fetch(`/api/orders/${order.id}`, {
@@ -99,6 +113,18 @@ export default function OrderDetailClient({
               </button>
             ))}
           </div>
+
+          <div style={{ height: 1, background: 'var(--line)', margin: '18px 0 14px' }} />
+
+          <button
+            type="button"
+            className="mini-btn red"
+            disabled={busy}
+            onClick={deleteOrder}
+            style={{ width: '100%' }}
+          >
+            🗑 Удалить заказ {order.number}
+          </button>
         </div>
       </div>
     </div>

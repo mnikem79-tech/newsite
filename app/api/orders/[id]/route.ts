@@ -23,6 +23,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   return NextResponse.json({ ...r.rows[0], items: it.rows });
 }
 
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const uid = await adminId();
+  if (!uid) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const r = await q('DELETE FROM orders WHERE id = $1 RETURNING id', [id]);
+  if (!r.rows.length) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  return NextResponse.json({ ok: true });
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const uid = await adminId();
