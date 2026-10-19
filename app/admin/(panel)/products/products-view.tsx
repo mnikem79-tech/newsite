@@ -104,6 +104,67 @@ export default function ProductsView({ products, categories: initialCategories }
     }
   }
 
+  // Массовые действия с товарами
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkCat, setBulkCat] = useState<string>('');
+
+  const toggleSelect = (id: number) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const clearSelection = () => {
+    setSelected(new Set());
+    setBulkCat('');
+  };
+
+  const selectAllVisible = () => setSelected(new Set(visibleProducts.map((p) => p.id)));
+
+  const runBulk = async (action: 'hide' | 'show' | 'move' | 'delete') => {
+    const ids = [...selected];
+    if (!ids.length) return;
+    if (action === 'delete') {
+      if (!confirm(`Удалить выбранные товары (${ids.length} шт.)? Действие необратимо.`)) return;
+    } else if (action === 'move' && !bulkCat) {
+      alert('Сначала выберите раздел, в который нужно переместить товары.');
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
+      const res = await fetch('/api/products/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids,
+          action,
+          ...(action === 'move' ? { category_id: Number(bulkCat) } : {}),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Не удалось выполнить действие');
+      clearSelection();
+      setOk(
+        action === 'delete'
+          ? `Удалено товаров: ${data.count ?? ids.length}`
+          : action === 'hide'
+            ? `Скрыто товаров: ${data.count ?? ids.length}`
+            : action === 'show'
+              ? `Показано товаров: ${data.count ?? ids.length}`
+              : `Перемещено товаров: ${data.count ?? ids.length}`
+      );
+      setTimeout(() => setOk(null), 4000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const moveProduct = async (p: ProductItem, dir: -1 | 1) => {
     const list = visibleProducts;
     const idx = list.findIndex((x) => x.id === p.id);
@@ -306,10 +367,63 @@ export default function ProductsView({ products, categories: initialCategories }
             )}
           </div>
 
+          {selected.size > 0 && (
+            <div
+              className="a-card"
+              style={{
+                marginBottom: 14,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexWrap: 'wrap',
+                padding: '12px 14px',
+              }}
+            >
+              <strong style={{ fontSize: 14 }}>Выделено: {selected.size}</strong>
+              <button className="mini-btn" disabled={busy} onClick={() => runBulk('show')}>
+                👁 Показать
+              </button>
+              <button className="mini-btn" disabled={busy} onClick={() => runBulk('hide')}>
+                🚫 Скрыть
+              </button>
+              <select
+                className="mini-btn"
+                value={bulkCat}
+                onChange={(e) => setBulkCat(e.target.value)}
+                style={{ width: 'auto' }}
+                title="Раздел для перемещения"
+              >
+                <option value="">— раздел —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.code} · {c.name_ru}
+                  </option>
+                ))}
+              </select>
+              <button className="mini-btn" disabled={busy || !bulkCat} onClick={() => runBulk('move')}>
+                📁 Переместить
+              </button>
+              <button className="mini-btn red" disabled={busy} onClick={() => runBulk('delete')}>
+                🗑 Удалить
+              </button>
+              <button className="mini-btn" style={{ marginLeft: 'auto' }} onClick={clearSelection}>
+                Снять выделение
+              </button>
+            </div>
+          )}
+
           <div className="atable-wrap">
             <table className="atable">
               <thead>
                 <tr>
+                  <th style={{ width: 34 }}>
+                    <input
+                      type="checkbox"
+                      checked={visibleProducts.length > 0 && selected.size === visibleProducts.length}
+                      onChange={(e) => (e.target.checked ? selectAllVisible() : clearSelection())}
+                      title="Выделить все"
+                    />
+                  </th>
                   <th style={{ width: 92 }}>#</th>
                   <th>Код</th>
                   <th>Наименование</th>
@@ -322,13 +436,21 @@ export default function ProductsView({ products, categories: initialCategories }
               <tbody>
                 {visibleProducts.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                    <td colSpan={8} className="muted" style={{ textAlign: 'center', padding: 24 }}>
                       {searching ? 'Ничего не найдено. Попробуйте другой запрос.' : 'Товаров пока нет.'}
                     </td>
                   </tr>
                 )}
                 {visibleProducts.map((p) => (
                   <tr key={p.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selected.has(p.id)}
+                        onChange={() => toggleSelect(p.id)}
+                        title="Выделить товар"
+                      />
+                    </td>
                     <td>
                       {!searching ? (
                         <div className="act" style={{ gap: 2 }}>
