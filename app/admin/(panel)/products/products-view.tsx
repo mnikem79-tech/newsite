@@ -28,6 +28,7 @@ export interface ProductItem {
   price_note: string | null;
   is_active: boolean;
   icon: string;
+  position: number;
 }
 
 interface Props {
@@ -52,6 +53,96 @@ export default function ProductsView({ products, categories: initialCategories }
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+
+  // Поиск по товарам
+  const [q, setQ] = useState('');
+  // Локальный порядок внутри раздела: category_id -> массив id в нужном порядке
+  const [order, setOrder] = useState<Record<number, number[]>>({});
+
+  const query = q.trim().toLowerCase();
+  const searching = query.length > 0;
+
+  // Применяем поиск, затем локальный порядок внутри каждого раздела
+  const visibleProducts = (() => {
+    const base = searching
+      ? products.filter(
+          (p) =>
+            p.name_ru.toLowerCase().includes(query) ||
+            p.code.toLowerCase().includes(query) ||
+            p.cat_ru.toLowerCase().includes(query) ||
+            (p.description_ru || '').toLowerCase().includes(query)
+        )
+      : products;
+
+    const byCat = new Map<number, ProductItem[]>();
+    for (const p of base) {
+      if (!byCat.has(p.category_id)) byCat.set(p.category_id, []);
+      byCat.get(p.category_id)!.push(p);
+    }
+    const out: ProductItem[] = [];
+    for (const [catId, items] of byCat) {
+      const ids = order[catId];
+      if (ids && ids.length === items.length && ids.every((id) => items.some((i) => i.id === id))) {
+        const map = new Map(items.map((i) => [i.id, i]));
+        for (const id of ids) out.push(map.get(id)!);
+      } else {
+        out.push(...items);
+      }
+    }
+    return out;
+  })();
+
+  // Номер товара внутри своего раздела — для показа в колонке «#»
+  const positionInCategory = new Map<number, number>();
+  {
+    const seen = new Map<number, number>();
+    for (const p of visibleProducts) {
+      seen.set(p.category_id, (seen.get(p.category_id) || 0) + 1);
+      positionInCategory.set(p.id, seen.get(p.category_id)!);
+    }
+  }
+
+  const moveProduct = async (p: ProductItem, dir: -1 | 1) => {
+    const list = visibleProducts;
+    const idx = list.findIndex((x) => x.id === p.id);
+    if (idx < 0) return;
+
+    // ищем ближайшего соседа в том же разделе
+    let target = idx + dir;
+    while (target >= 0 && target < list.length && list[target].category_id !== p.category_id) {
+      target += dir;
+    }
+    if (target < 0 || target >= list.length) return;
+
+    const next = [...list];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    const catIds = next.filter((x) => x.category_id === p.category_id).map((x) => x.id);
+
+    setOrder((prev) => ({ ...prev, [p.category_id]: catIds }));
+    setBusy(true);
+    setErr(null);
+    try {
+      const res = await fetch('/api/products/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category_id: p.category_id, ids: catIds }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Не удалось сохранить порядок');
+      setOk(`Порядок в разделе «${p.cat_ru}» сохранён`);
+      setTimeout(() => setOk(null), 3000);
+      router.refresh();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : String(ex));
+      setOrder((prev) => {
+        const copy = { ...prev };
+        delete copy[p.category_id];
+        return copy;
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   // Form fields
   const [formCode, setFormCode] = useState('');
@@ -182,7 +273,11 @@ export default function ProductsView({ products, categories: initialCategories }
           <div className="a-head">
             <div>
               <h2 style={{ fontSize: 20, margin: 0 }}>Товары каталога</h2>
-              <div className="sub">{products.length} позиций в каталоге</div>
+              <div className="sub">
+                {searching
+                  ? `Найдено: ${visibleProducts.length} из ${products.length}`
+                  : `${products.length} позиций в каталоге`}
+              </div>
             </div>
             <button
               className="btn primary sm"
@@ -195,10 +290,25 @@ export default function ProductsView({ products, categories: initialCategories }
             </button>
           </div>
 
+          <div className="field" style={{ marginBottom: 14, maxWidth: 460 }}>
+            <label>Поиск товара</label>
+            <input
+              placeholder="Название, код, раздел или описание"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            {searching && (
+              <button className="mini-btn" style={{ marginTop: 8 }} onClick={() => setQ('')}>
+                Сбросить поиск
+              </button>
+            )}
+          </div>
+
           <div className="atable-wrap">
             <table className="atable">
               <thead>
                 <tr>
+                  <th style={{ width: 92 }}>#</th>
                   <th>Код</th>
                   <th>Наименование</th>
                   <th>Раздел</th>
@@ -208,8 +318,42 @@ export default function ProductsView({ products, categories: initialCategories }
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {visibleProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                      {searching ? 'Ничего не найдено. Попробуйте другой запрос.' : 'Товаров пока нет.'}
+                    </td>
+                  </tr>
+                )}
+                {visibleProducts.map((p) => (
                   <tr key={p.id}>
+                    <td>
+                      {!searching ? (
+                        <div className="act" style={{ gap: 2 }}>
+                          <button
+                            className="mini-btn"
+                            title="Выше"
+                            disabled={busy}
+                            onClick={() => moveProduct(p, -1)}
+                          >
+                            ↑
+                          </button>
+                          <button
+                            className="mini-btn"
+                            title="Ниже"
+                            disabled={busy}
+                            onClick={() => moveProduct(p, 1)}
+                          >
+                            ↓
+                          </button>
+                          <span className="muted" style={{ marginLeft: 4, fontSize: 12 }}>
+                            {positionInCategory.get(p.id)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
                     <td className="mono">{p.code}</td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{p.name_ru}</div>

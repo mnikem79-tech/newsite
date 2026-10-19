@@ -2,7 +2,7 @@ import { getContentCached, getPagesCached } from './db';
 import seed from './seed-data';
 import { getDefaultSections } from './default-sections';
 import type {
-  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, PageItem, ServiceItem, SiteSettings,
+  AboutIntro, ChromeBlock, ContactInfo, HomeHero, MaterialItem, PageSection, PageItem, ServiceItem,
 } from './types';
 import { sanitizeChrome } from './chrome';
 
@@ -10,7 +10,6 @@ const D = seed.contentDefaults as {
   home_hero: HomeHero;
   about_intro: AboutIntro;
   contacts: ContactInfo;
-  site: SiteSettings;
   materials: MaterialItem[];
   services: ServiceItem[];
 };
@@ -28,11 +27,6 @@ export async function getAboutIntro(): Promise<AboutIntro> {
 export async function getContacts(): Promise<ContactInfo> {
   const d = (await getContentCached('contacts')) as Partial<ContactInfo> | null;
   return { ...D.contacts, ...(d ?? {}) };
-}
-
-export async function getSite(): Promise<SiteSettings> {
-  const d = (await getContentCached('site')) as Partial<SiteSettings> | null;
-  return { ...D.site, ...(d ?? {}) };
 }
 
 export async function getMaterials(): Promise<MaterialItem[]> {

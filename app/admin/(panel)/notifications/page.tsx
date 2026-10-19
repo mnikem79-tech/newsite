@@ -14,13 +14,9 @@ async function getKey(key: string): Promise<unknown> {
 }
 
 export default async function AdminNotificationsPage() {
-  const [notifRaw, siteRaw] = await Promise.all([
-    getKey('notifications'),
-    getKey('site'),
-  ]);
+  const notifRaw = await getKey('notifications');
 
   const notif = (notifRaw as Record<string, any>) || {};
-  const site = (siteRaw as Record<string, any>) || {};
 
   // Build Telegram recipients list with fallbacks
   let telegram_recipients: BotRecipient[] = [];
@@ -30,8 +26,8 @@ export default async function AdminNotificationsPage() {
       name: String(r.name || '').trim(),
       enabled: r.enabled !== false,
     }));
-  } else if (site.telegram_chat_id || process.env.TELEGRAM_CHAT_ID) {
-    const rawIds = String(site.telegram_chat_id || process.env.TELEGRAM_CHAT_ID || '545061255').split(/[,;\s]+/);
+  } else if (process.env.TELEGRAM_CHAT_ID) {
+    const rawIds = String(process.env.TELEGRAM_CHAT_ID || '545061255').split(/[,;\s]+/);
     telegram_recipients = rawIds.filter(Boolean).map((id: string, idx: number) => ({
       id: id.trim(),
       name: idx === 0 ? 'Основной' : `Сотрудник ${idx + 1}`,
@@ -49,8 +45,8 @@ export default async function AdminNotificationsPage() {
       name: String(r.name || '').trim(),
       enabled: r.enabled !== false,
     }));
-  } else if (site.vk_user_id || process.env.VK_USER_ID) {
-    const rawIds = String(site.vk_user_id || process.env.VK_USER_ID || '6779859').split(/[,;\s]+/);
+  } else if (process.env.VK_USER_ID) {
+    const rawIds = String(process.env.VK_USER_ID || '6779859').split(/[,;\s]+/);
     vk_recipients = rawIds.filter(Boolean).map((id: string, idx: number) => ({
       id: id.trim(),
       name: idx === 0 ? 'Основной' : `Сотрудник ${idx + 1}`,
@@ -80,12 +76,12 @@ export default async function AdminNotificationsPage() {
 
   const initialConfig: BotNotificationsConfig = {
     telegram_enabled: notif.telegram_enabled ?? true,
-    telegram_bot_token: notif.telegram_bot_token || site.telegram_bot_token || '',
+    telegram_bot_token: notif.telegram_bot_token || '',
     telegram_api_url: notif.telegram_api_url || 'https://api.telegram.org',
     telegram_recipients,
 
     vk_enabled: notif.vk_enabled ?? true,
-    vk_bot_token: notif.vk_bot_token || site.vk_bot_token || '',
+    vk_bot_token: notif.vk_bot_token || '',
     vk_recipients,
 
     mail_enabled: notif.mail_enabled ?? notif.email_enabled ?? true,

@@ -87,13 +87,6 @@ export interface AboutIntro {
   intro_ru: string;
 }
 
-export interface SiteSettings {
-  topbar_ru: string;
-  footer_ru: string;
-  telegram_url: string;
-  [key: string]: string | undefined;
-}
-
 /* ============================================================
    PAGE BUILDER & MEDIA TYPES
    ============================================================ */
