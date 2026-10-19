@@ -40,8 +40,8 @@ export async function POST(req: Request) {
   let slug = `${slugBase}-${code.replace(/[./\s]+/g, '-')}`.replace(/^-+|-+$/g, '').slice(0, 70);
 
   const res = await q(
-    `INSERT INTO products (slug, category_id, code, name_ru, description_ru, detail_html, price, price_note, is_active, icon, position)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, (SELECT COALESCE(MAX(position),0)+1 FROM products))
+    `INSERT INTO products (slug, category_id, code, name_ru, description_ru, detail_html, price, price_note, is_active, icon, meta_title, meta_description, position)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, (SELECT COALESCE(MAX(position),0)+1 FROM products))
      RETURNING id, slug`,
     [
       slug, category_id, code,
@@ -52,6 +52,8 @@ export async function POST(req: Request) {
       b?.price_note ? String(b.price_note).slice(0, 200) : null,
       b?.is_active !== false,
       String(b?.icon ?? '⚡').slice(0, 8) || '⚡',
+      b?.meta_title ? String(b.meta_title).slice(0, 120) : null,
+      b?.meta_description ? String(b.meta_description).slice(0, 320) : null,
     ]
   );
   return NextResponse.json(res.rows[0], { status: 201 });

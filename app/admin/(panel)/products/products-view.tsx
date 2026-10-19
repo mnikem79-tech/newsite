@@ -29,6 +29,8 @@ export interface ProductItem {
   is_active: boolean;
   icon: string;
   position: number;
+  meta_title: string | null;
+  meta_description: string | null;
 }
 
 interface Props {
@@ -383,6 +385,8 @@ export default function ProductsView({ products, categories: initialCategories }
                               price_note: p.price_note,
                               is_active: p.is_active,
                               icon: p.icon,
+                              meta_title: p.meta_title,
+                              meta_description: p.meta_description,
                             });
                             setEditOpen(true);
                           }}

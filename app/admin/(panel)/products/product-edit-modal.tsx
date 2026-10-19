@@ -13,6 +13,8 @@ export interface ProductFormValues {
   price_note: string | null;
   is_active: boolean;
   icon: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
 }
 
 /** Product editor shown as a popup on the «Товары» page. */
@@ -37,6 +39,8 @@ export default function ProductEditModal({
     price_note: null,
     is_active: true,
     icon: '⚡',
+    meta_title: '',
+    meta_description: '',
   };
   const base = initial ?? blank;
 
@@ -48,6 +52,8 @@ export default function ProductEditModal({
     detail_html: base.detail_html ?? '',
     price: base.price != null ? String(base.price) : '',
     price_note: base.price_note ?? '',
+    meta_title: base.meta_title ?? '',
+    meta_description: base.meta_description ?? '',
   });
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -68,6 +74,8 @@ export default function ProductEditModal({
         category_id: Number(f.category_id),
         price: f.price === '' ? null : Number(f.price),
         detail_html: f.detail_html.trim() || null,
+        meta_title: f.meta_title.trim() || null,
+        meta_description: f.meta_description.trim() || null,
       };
       const res = await fetch(initial?.id ? `/api/products/${initial.id}` : '/api/products', {
         method: initial?.id ? 'PUT' : 'POST',
@@ -160,6 +168,42 @@ export default function ProductEditModal({
             value={f.detail_html}
             onChange={(v) => setF((p) => ({ ...p, detail_html: v }))}
           />
+
+          <div style={{ height: 1, background: 'var(--line)', margin: '22px 0' }} />
+
+          <h4 style={{ fontSize: 14.5, fontWeight: 700, margin: '0 0 4px' }}>
+            Настройки для поисковиков (Яндекс, Google)
+          </h4>
+          <p style={{ fontSize: 12.5, color: 'var(--muted)', margin: '0 0 14px' }}>
+            Необязательно. Если оставить пустым, поисковики возьмут название и короткое описание товара.
+          </p>
+
+          <div className="field">
+            <label>Заголовок в результатах поиска</label>
+            <input
+              value={f.meta_title}
+              onChange={set('meta_title')}
+              placeholder={f.name_ru || 'Например: Трансформатор ТМ-1000/10'}
+              maxLength={120}
+            />
+            <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
+              До 120 символов. Лучше не длиннее 70 — иначе поисковик обрежет.
+            </div>
+          </div>
+
+          <div className="field">
+            <label>Описание в результатах поиска</label>
+            <textarea
+              rows={2}
+              value={f.meta_description}
+              onChange={set('meta_description')}
+              placeholder="1–2 предложения: что это, ключевые характеристики, для кого"
+              maxLength={320}
+            />
+            <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
+              До 320 символов. Это текст, который видит человек в поиске под заголовком.
+            </div>
+          </div>
 
           <label className="check" style={{ marginTop: 16 }}>
             <input

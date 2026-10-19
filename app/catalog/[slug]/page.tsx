@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { q } from '@/lib/db';
@@ -5,6 +6,35 @@ import ProductDetail from '@/components/ProductDetail';
 import type { Product } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
+
+function stripTags(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function seoFor(product: Product) {
+  const anyP = product as unknown as Record<string, string | null>;
+  const title = String(anyP.meta_title ?? '').trim() || String(product.name_ru ?? '').trim();
+  const fallback = stripTags(String(product.description_ru ?? '')).slice(0, 320);
+  const description = String(anyP.meta_description ?? '').trim() || fallback;
+  return { title, description };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const r = await q(
+      `SELECT p.*, c.slug AS cat_slug, c.name_ru AS cat_ru, c.icon AS cat_icon
+       FROM products p JOIN categories c ON c.id = p.category_id
+       WHERE p.slug = $1 AND p.is_active = TRUE`,
+      [slug]
+    );
+    if (!r.rows.length) return {};
+    const { title, description } = seoFor(r.rows[0] as unknown as Product);
+    return { title, ...(description ? { description } : {}) };
+  } catch {
+    return {};
+  }
+}
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

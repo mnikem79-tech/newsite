@@ -21,6 +21,8 @@ async function readFields(b: any) {
     price_note: b?.price_note ? String(b.price_note).slice(0, 200) : null,
     is_active: b?.is_active !== false,
     icon: String(b?.icon ?? '⚡').slice(0, 8) || '⚡',
+    meta_title: b?.meta_title ? String(b.meta_title).slice(0, 120) : null,
+    meta_description: b?.meta_description ? String(b.meta_description).slice(0, 320) : null,
   };
 }
 
@@ -40,9 +42,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!Number.isInteger(f.category_id)) return NextResponse.json({ error: 'category required' }, { status: 400 });
   const r = await q(
     `UPDATE products SET name_ru=$2, code=$3, category_id=$4, description_ru=$5, detail_html=$6,
-     price=$7, price_note=$8, is_active=$9, icon=$10, updated_at=now()
+     price=$7, price_note=$8, is_active=$9, icon=$10, meta_title=$11, meta_description=$12, updated_at=now()
      WHERE id=$1 RETURNING id`,
-    [id, f.name_ru, f.code, f.category_id, f.description_ru, f.detail_html, f.price, f.price_note, f.is_active, f.icon]
+    [id, f.name_ru, f.code, f.category_id, f.description_ru, f.detail_html, f.price, f.price_note, f.is_active, f.icon, f.meta_title, f.meta_description]
   );
   if (!r.rows.length) return NextResponse.json({ error: 'not found' }, { status: 404 });
   return NextResponse.json(r.rows[0]);
